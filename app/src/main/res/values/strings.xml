@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LoveCoder</string>
+    <string name="drawer_open">LoveCoder</string>
+    <string name="drawer_close">LoveCoder</string>
+</resources>
