@@ -62,8 +62,7 @@ public class SystemBarTintManager {
     }
 
     /**
-     * @param activity The host activity.
-     */
+     * @param activity The host activity.     */
     @TargetApi(19)
     public SystemBarTintManager(Activity activity) {
 
