@@ -48,6 +48,8 @@ android {
         compile rootProject.ext.dependencies["rxandroid"]
         compile rootProject.ext.dependencies["okhttp3:logging-interceptor"]
         compile rootProject.ext.dependencies["butterknife"]
+        compile rootProject.ext.dependencies["glide"]
+        compile rootProject.ext.dependencies["picasso"]
 
 
     }
