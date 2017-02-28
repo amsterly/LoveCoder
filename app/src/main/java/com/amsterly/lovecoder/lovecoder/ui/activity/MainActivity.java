@@ -1,4 +1,4 @@
-package com.amsterly.lovecoder.lovecoder.ui;
+package com.amsterly.lovecoder.lovecoder.ui.activity;
 
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
@@ -14,8 +14,11 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
 import com.amsterly.lovecoder.lovecoder.R;
+import com.amsterly.lovecoder.lovecoder.presenter.home.MainPresenter;
+import com.amsterly.lovecoder.lovecoder.ui.activity.base.BaseActivity;
+import com.amsterly.lovecoder.lovecoder.view.home.IMain;
 
-public class MainActivity extends BaseCompatActivity implements AppBarLayout.OnOffsetChangedListener, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends BaseActivity<IMain, MainPresenter> implements IMain, AppBarLayout.OnOffsetChangedListener, SwipeRefreshLayout.OnRefreshListener {
 
     private DrawerLayout mDrawerLayout;
     private NavigationView navigationView;
@@ -84,6 +87,11 @@ public class MainActivity extends BaseCompatActivity implements AppBarLayout.OnO
 
             }
         });
+    }
+
+    @Override
+    protected MainPresenter createPresenter() {
+        return new MainPresenter(this);
     }
 
     @Override
