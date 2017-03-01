@@ -15,6 +15,9 @@ import com.amsterly.lovecoder.lovecoder.presenter.base.BasePresenter;
 import com.amsterly.lovecoder.lovecoder.utils.SystemBarTintManager;
 import com.amsterly.lovecoder.lovecoder.view.base.IBase;
 
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
+
 
 /**
  * Created by fancy on 2016/6/23.
@@ -22,13 +25,34 @@ import com.amsterly.lovecoder.lovecoder.view.base.IBase;
 public abstract class BaseActivity<V,T extends BasePresenter<V>> extends AppCompatActivity implements IBase {
     protected T mPresenter;
     protected boolean nowRequest;
+    private CompositeSubscription mCompositeSubscription;
 
+
+    public CompositeSubscription getCompositeSubscription() {
+        if (this.mCompositeSubscription == null) {
+            this.mCompositeSubscription = new CompositeSubscription();
+        }
+
+        return this.mCompositeSubscription;
+    }
+
+
+    public void addSubscription(Subscription s) {
+        if (this.mCompositeSubscription == null) {
+            this.mCompositeSubscription = new CompositeSubscription();
+        }
+
+        this.mCompositeSubscription.add(s);
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if(mPresenter != null)
             mPresenter.dettachView();
+        if (this.mCompositeSubscription != null) {
+            this.mCompositeSubscription.unsubscribe();
+        }
     }
 
 
@@ -168,5 +192,6 @@ public abstract class BaseActivity<V,T extends BasePresenter<V>> extends AppComp
             }
         });
     }
+
 
 }

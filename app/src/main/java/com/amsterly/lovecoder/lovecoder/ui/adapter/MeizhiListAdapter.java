@@ -83,11 +83,9 @@ public class MeizhiListAdapter
                 .getSize(new SizeReadyCallback() {
                     @Override
                     public void onSizeReady(int width, int height) {
-
                         if (!viewHolder.card.isShown()) {
                             viewHolder.card.setVisibility(View.VISIBLE);
                         }
-
                     }
                 });
     }

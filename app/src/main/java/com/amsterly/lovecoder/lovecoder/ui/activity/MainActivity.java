@@ -1,15 +1,20 @@
 package com.amsterly.lovecoder.lovecoder.ui.activity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -19,25 +24,37 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.amsterly.lovecoder.lovecoder.App;
 import com.amsterly.lovecoder.lovecoder.R;
 import com.amsterly.lovecoder.lovecoder.func.OnMeizhiTouchListener;
+import com.amsterly.lovecoder.lovecoder.model.MeizhiData;
 import com.amsterly.lovecoder.lovecoder.model.entity.Gank;
 import com.amsterly.lovecoder.lovecoder.model.entity.Meizhi;
+import com.amsterly.lovecoder.lovecoder.model.休息视频Data;
 import com.amsterly.lovecoder.lovecoder.presenter.home.MainPresenter;
 import com.amsterly.lovecoder.lovecoder.ui.activity.base.SwipeRefreshBaseActivity;
 import com.amsterly.lovecoder.lovecoder.ui.adapter.MeizhiListAdapter;
 import com.amsterly.lovecoder.lovecoder.utils.Dates;
+import com.litesuits.orm.db.assit.QueryBuilder;
+import com.litesuits.orm.db.model.ConflictAlgorithm;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayout.OnOffsetChangedListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -59,6 +76,8 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
     DrawerLayout mDrawerLayout;
     @Bind(R.id.recyclerview)
     RecyclerView recyclerview;
+    @Bind(R.id.main_fab)
+    FloatingActionButton mainFab;
     private ActionBarDrawerToggle mDrawerToggle;
     private final static String TAG = "MainActivity";
     private MeizhiListAdapter mMeizhiListAdapter;
@@ -112,7 +131,17 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
                 return true;
             }
         });
+        mMeizhiList = new ArrayList<>();
+        QueryBuilder query = new QueryBuilder(Meizhi.class);
+        query.appendOrderDescBy("publishedAt");
+        query.limit(0, 10);
+        if (App.sDb.query(query) != null)
+            mMeizhiList.addAll(App.sDb.query(query));
+        setupRecyclerView();
+
     }
+
+
 
     @Override
     protected MainPresenter createPresenter() {
@@ -127,8 +156,8 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
     @Override
     protected void onResume() {
         super.onResume();
-        mAppBarLayout.setExpanded(false, true);
-        mAppBarLayout.setExpanded(true, true);
+//        mAppBarLayout.setExpanded(false, true);
+//        mAppBarLayout.setExpanded(true, true);
     }
 
     @Override
@@ -136,16 +165,19 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         super.onDestroy();
         ButterKnife.unbind(this);
     }
-    @Override protected void onPostCreate(Bundle savedInstanceState) {
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 loadData(true);
             }
-        },358);
+        }, 358);
         ;
     }
+
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
         mSwipeRefreshLayout.setEnabled(verticalOffset == 0);
@@ -170,7 +202,6 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
 //                    })
 //                    .show();
 //        });
-
         recyclerview.addOnScrollListener(getOnBottomListener(layoutManager));
         mMeizhiListAdapter.setOnMeizhiTouchListener(getOnMeizhiTouchListener());
     }
@@ -194,39 +225,76 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
             }
         };
     }
+
     private void loadData() {
         loadData(/* clean */false);
     }
-    /**
-     * 获取服务数据
-     *
-     * @param clean 清除来自数据库缓存或者已有数据。
-     */
+
     private void loadData(boolean clean) {
-//        mLastVideoIndex = 0;
-//        // @formatter:off
-//        Subscription s = Observable
-//                .zip(sGankIO.getMeizhiData(mPage),
-//                        sGankIO.get休息视频Data(mPage),
-//                        this::createMeizhiDataWith休息视频Desc)
-//                .map(meizhiData -> meizhiData.results)
-//                .flatMap(Observable::from)
-//                .toSortedList((meizhi1, meizhi2) ->
-//                        meizhi2.publishedAt.compareTo(meizhi1.publishedAt))
-//                .doOnNext(this::saveMeizhis)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .finallyDo(() -> setRefresh(false))
-//                .subscribe(meizhis -> {
-//                    if (clean) mMeizhiList.clear();
-//                    mMeizhiList.addAll(meizhis);
-//                    mMeizhiListAdapter.notifyDataSetChanged();
-//                    setRefresh(false);
-//                }, throwable -> loadError(throwable));
-//        // @formatter:on
-//        addSubscription(s);
+        mLastVideoIndex = 0;
+        // @formatter:off
+        Subscription s = Observable
+                .zip(sGankIO.getMeizhiData(mPage),
+                        sGankIO.get休息视频Data(mPage),
+                        this::createMeizhiDataWith休息视频Desc)
+                .map(new Func1<MeizhiData, List<Meizhi>>() {
+                    @Override
+                    public List<Meizhi> call(MeizhiData meizhiData) {
+                        return meizhiData.results;
+                    }
+                })
+                .flatMap(new Func1<List<Meizhi>, Observable<? extends Meizhi>>() {
+                    @Override
+                    public Observable<? extends Meizhi> call(List<Meizhi> iterable) {
+                        return Observable.from(iterable);
+                    }
+                })
+                .toSortedList(new Func2<Meizhi, Meizhi, Integer>() {
+                    @Override
+                    public Integer call(Meizhi meizhi1, Meizhi meizhi2) {
+                        return meizhi2.publishedAt.compareTo(meizhi1.publishedAt);
+                    }
+                })
+                .doOnNext(new Action1<List<Meizhi>>() {
+                    @Override
+                    public void call(List<Meizhi> meizhis) {
+                        MainActivity.this.saveMeizhis(meizhis);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .finallyDo(new Action0() {
+                    @Override
+                    public void call() {
+                        setRefresh(false);
+                    }
+                })
+                .subscribe(new Action1<List<Meizhi>>() {
+                    @Override
+                    public void call(List<Meizhi> meizhis) {
+                        if (clean) mMeizhiList.clear();
+                        mMeizhiList.addAll(meizhis);
+                        mMeizhiListAdapter.notifyDataSetChanged();
+                        MainActivity.this.setRefresh(false);
+                    }
+                }, throwable -> loadError(throwable));
+        // @formatter:on
+        addSubscription(s);
     }
+
     private int mLastVideoIndex = 0;
 
+    private void startPictureActivity(Meizhi meizhi, View transitView) {
+        Intent intent = PictureActivity.newIntent(MainActivity.this, meizhi.url, meizhi.desc);
+        startActivity(intent);
+//        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                MainActivity.this, transitView, PictureActivity.TRANSIT_PIC);
+        try {
+//            ActivityCompat.startActivity(MainActivity.this, intent, optionsCompat.toBundle());
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+//            startActivity(intent);
+        }
+    }
 
     private String getFirstVideoDesc(Date publishedAt, List<Gank> results) {
         String videoDesc = "";
@@ -241,6 +309,48 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         }
         return videoDesc;
     }
+
+    public void onToolbarClick() {
+        recyclerview.smoothScrollToPosition(0);
+    }
+
+
+    @OnClick(R.id.main_fab)
+    public void onFab(View v) {
+        if (mMeizhiList != null && mMeizhiList.size() > 0) {
+//            startGankActivity(mMeizhiList.get(0).publishedAt);
+        }
+    }
+
+
+    @Override
+    public void requestDataRefresh() {
+        super.requestDataRefresh();
+        mPage = 1;
+        loadData(true);
+    }
+
+    private void saveMeizhis(List<Meizhi> meizhis) {
+        App.sDb.insert(meizhis, ConflictAlgorithm.Replace);
+    }
+
+    private void loadError(Throwable throwable) {
+        throwable.printStackTrace();
+        Snackbar.make(recyclerview, R.string.snap_load_fail, Snackbar.LENGTH_LONG)
+                .setAction(R.string.retry, v -> {
+                    requestDataRefresh();
+                })
+                .show();
+    }
+
+    private MeizhiData createMeizhiDataWith休息视频Desc(MeizhiData data, 休息视频Data love) {
+        for (Meizhi meizhi : data.results) {
+            meizhi.desc = meizhi.desc + " " +
+                    getFirstVideoDesc(meizhi.publishedAt, love.results);
+        }
+        return data;
+    }
+
     private OnMeizhiTouchListener getOnMeizhiTouchListener() {
         return (new OnMeizhiTouchListener() {
             @Override
@@ -253,7 +363,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
                         @Override
                         public void onSuccess() {
                             mMeizhiBeTouched = false;
-//                        startPictureActivity(meizhi, meizhiView);
+                            startPictureActivity(meizhi, meizhiView);
                         }
 
 

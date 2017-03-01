@@ -1,20 +1,29 @@
 package com.amsterly.lovecoder.lovecoder.ui.activity.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.View;
 
 import com.amsterly.lovecoder.lovecoder.R;
+import com.amsterly.lovecoder.lovecoder.model.entity.Meizhi;
 import com.amsterly.lovecoder.lovecoder.network.DrakeetFactory;
 import com.amsterly.lovecoder.lovecoder.network.GankApi;
 import com.amsterly.lovecoder.lovecoder.presenter.base.BasePresenter;
 import com.amsterly.lovecoder.lovecoder.presenter.home.MainPresenter;
+import com.amsterly.lovecoder.lovecoder.ui.activity.MainActivity;
+import com.amsterly.lovecoder.lovecoder.ui.activity.PictureActivity;
 import com.amsterly.lovecoder.lovecoder.ui.base.SwipeRefreshLayer;
 import com.amsterly.lovecoder.lovecoder.ui.widget.MultiSwipeRefreshLayout;
 import com.amsterly.lovecoder.lovecoder.view.home.IMain;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 
 /**
@@ -91,4 +100,6 @@ public  class SwipeRefreshBaseActivity extends BaseActivity<IMain, MainPresenter
     public boolean isRequestDataRefresh() {
         return mIsRequestDataRefresh;
     }
+
+
 }

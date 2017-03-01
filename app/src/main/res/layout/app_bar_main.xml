@@ -58,8 +58,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingLeft="2dp"
-            android:paddingRight="2dp"/>
+            android:paddingRight="2dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/main_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="@dimen/fab_margin_bottom"
+            android:clickable="true"
+            android:elevation="4dp"
+            app:elevation="4dp"
 
+            app:borderWidth="0dp"
+            app:layout_anchorGravity="right|bottom"
+            app:layout_behavior="com.amsterly.lovecoder.lovecoder.behavior.ScrollAwareFABBehavior"
+            android:src="@mipmap/ic_github"/>
+        <!--            app:layout_anchor="@id/swipe_container"-->
     </android.support.design.widget.CoordinatorLayout>
 
 
