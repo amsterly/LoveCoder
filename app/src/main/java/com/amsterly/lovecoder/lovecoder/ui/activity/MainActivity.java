@@ -56,7 +56,7 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
-public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayout.OnOffsetChangedListener, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayout.OnOffsetChangedListener {
 
     @Bind(R.id.relativeLayout)
     TextView relativeLayout;
@@ -93,9 +93,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mAppBarLayout.addOnOffsetChangedListener(this);
-        mSwipeRefreshLayout.setProgressViewOffset(false, 0, 100);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(
                 R.id.collapse_toolbar);
         collapsingToolbar.setTitleEnabled(false);
@@ -185,13 +183,10 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         mToolbar.setAlpha(alpha);
     }
 
-    @Override
-    public void onRefresh() {
-        mSwipeRefreshLayout.setRefreshing(false);
-    }
+
 
     private void setupRecyclerView() {
-        final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,
+        final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3,
                 StaggeredGridLayoutManager.VERTICAL);
         recyclerview.setLayoutManager(layoutManager);
         mMeizhiListAdapter = new MeizhiListAdapter(this, mMeizhiList);
@@ -211,7 +206,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
             @Override
             public void onScrolled(RecyclerView rv, int dx, int dy) {
                 boolean isBottom =
-                        layoutManager.findLastCompletelyVisibleItemPositions(new int[2])[1] >=
+                        layoutManager.findLastCompletelyVisibleItemPositions(new int[3])[1] >=
                                 mMeizhiListAdapter.getItemCount() - PRELOAD_SIZE;
                 if (!mSwipeRefreshLayout.isRefreshing() && isBottom) {
                     if (!mIsFirstTimeTouchBottom) {
@@ -285,14 +280,13 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
 
     private void startPictureActivity(Meizhi meizhi, View transitView) {
         Intent intent = PictureActivity.newIntent(MainActivity.this, meizhi.url, meizhi.desc);
-        startActivity(intent);
-//        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                MainActivity.this, transitView, PictureActivity.TRANSIT_PIC);
+        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                MainActivity.this, transitView, PictureActivity.TRANSIT_PIC);
         try {
-//            ActivityCompat.startActivity(MainActivity.this, intent, optionsCompat.toBundle());
+            ActivityCompat.startActivity(MainActivity.this, intent, optionsCompat.toBundle());
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-//            startActivity(intent);
+            startActivity(intent);
         }
     }
 
@@ -337,9 +331,9 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
     private void loadError(Throwable throwable) {
         throwable.printStackTrace();
         Snackbar.make(recyclerview, R.string.snap_load_fail, Snackbar.LENGTH_LONG)
-                .setAction(R.string.retry, v -> {
-                    requestDataRefresh();
-                })
+//                .setAction(R.string.retry, v -> {
+//                    requestDataRefresh();
+//                })
                 .show();
     }
 
@@ -350,33 +344,46 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         }
         return data;
     }
-
     private OnMeizhiTouchListener getOnMeizhiTouchListener() {
-        return (new OnMeizhiTouchListener() {
-            @Override
-            public void onTouch(View v, View meizhiView, View card, Meizhi meizhi) {
-                if (meizhi == null) return;
-                if (v == meizhiView && !mMeizhiBeTouched) {
-                    mMeizhiBeTouched = true;
-                    Picasso.with(MainActivity.this).load(meizhi.url).fetch(new Callback() {
+        return (v, meizhiView, card, meizhi) -> {
+            if (meizhi == null) return;
+            if (v == meizhiView && !mMeizhiBeTouched) {
+                mMeizhiBeTouched = true;
+                Picasso.with(this).load(meizhi.url).fetch(new Callback() {
 
-                        @Override
-                        public void onSuccess() {
-                            mMeizhiBeTouched = false;
-                            startPictureActivity(meizhi, meizhiView);
-                        }
+                    @Override public void onSuccess() {
+                        mMeizhiBeTouched = false;
+                        startPictureActivity(meizhi, meizhiView);
+                    }
 
 
-                        @Override
-                        public void onError() {
-                            mMeizhiBeTouched = false;
-                        }
-                    });
-                } else if (v == card) {
+                    @Override public void onError() {mMeizhiBeTouched = false;}
+                });
+            } else if (v == card) {
 //                startGankActivity(meizhi.publishedAt);
-                }
             }
-        });
+        };
     }
+//    private OnMeizhiTouchListener getOnMeizhiTouchListener() {
+//        return (v, meizhiView, card, meizhi) -> {
+//            if (meizhi == null) return;
+//            if (v == meizhiView && !mMeizhiBeTouched) {
+//                mMeizhiBeTouched = true;
+//                Picasso.with(this).load(meizhi.url).fetch(new Callback() {
+//
+//                    @Override public void onSuccess() {
+//                        mMeizhiBeTouched = false;
+//                        startPictureActivity(meizhi, meizhiView);
+//                    }
+//
+//
+//                    @Override public void onError() {mMeizhiBeTouched = false;}
+//                });
+//            } else if (v == card) {
+//                startGankActivity(meizhi.publishedAt);
+//            }
+//        };
+//    }
+//    }
 
 }

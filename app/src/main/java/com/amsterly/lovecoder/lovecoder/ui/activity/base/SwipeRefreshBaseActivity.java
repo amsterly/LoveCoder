@@ -3,6 +3,7 @@ package com.amsterly.lovecoder.lovecoder.ui.activity.base;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -49,8 +50,12 @@ public  class SwipeRefreshBaseActivity extends BaseActivity<IMain, MainPresenter
         trySetupSwipeRefresh();
     }
 
+
+
     void trySetupSwipeRefresh() {
         if (mSwipeRefreshLayout != null) {
+//            mSwipeRefreshLayout.setProgressViewOffset(false, 0, 100);
+//            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
             mSwipeRefreshLayout.setColorSchemeResources(R.color.refresh_progress_3,
                     R.color.refresh_progress_2, R.color.refresh_progress_1);
             // Do not use lambda here!

@@ -132,5 +132,6 @@ public class MeizhiListAdapter
         public void onClick(View v) {
             mOnMeizhiTouchListener.onTouch(v, meizhiView, card, meizhi);
         }
+
     }
 }

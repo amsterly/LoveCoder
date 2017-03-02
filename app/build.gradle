@@ -56,5 +56,6 @@ android {
         compile rootProject.ext.dependencies["glide"]
         compile rootProject.ext.dependencies["picasso"]
         compile rootProject.ext.dependencies["photoview"]
+        compile rootProject.ext.dependencies["bilibili:DanmakuFlameMaster"]
     }
 }

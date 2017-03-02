@@ -104,11 +104,11 @@ public abstract class BaseActivity<V,T extends BasePresenter<V>> extends AppComp
         //显示进度条
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        this.finish();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        this.finish();
+//    }
 
     @Override
     protected void onResume() {

@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.animation.DecelerateInterpolator;
@@ -35,7 +36,7 @@ import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
 
-public abstract class ToolbarActivity extends BaseActivity<IPicture, PicturePresenter> implements IPicture {
+public abstract class ToolbarActivity  extends BaseActivity<IPicture, PicturePresenter> implements IPicture {
 
     abstract protected int provideContentViewId();
 
