@@ -57,5 +57,6 @@ android {
         compile rootProject.ext.dependencies["picasso"]
         compile rootProject.ext.dependencies["photoview"]
         compile rootProject.ext.dependencies["bilibili:DanmakuFlameMaster"]
+        compile rootProject.ext.dependencies["bilibili:ndkbitmap-armv7a"]
     }
 }
