@@ -26,7 +26,6 @@ import android.net.Uri;
 import com.amsterly.lovecoder.lovecoder.R;
 
 /**
- * Created by drakeet on 8/17/15.
  */
 public class Shares {
 

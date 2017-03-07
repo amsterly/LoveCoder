@@ -35,7 +35,7 @@ import com.amsterly.lovecoder.lovecoder.R;
 public class AnimRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<T> {
 
-    private static final int DELAY = 138;
+    private static final int DELAY = 100;
     private int mLastPosition = -1;
 
 
@@ -61,11 +61,13 @@ public class AnimRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
                             R.anim.slide_in_right);
                     animation.setAnimationListener(new Animation.AnimationListener() {
                         @Override public void onAnimationStart(Animation animation) {
-                            view.setAlpha(1);
+                            view.setAlpha(0.8f);
                         }
 
 
-                        @Override public void onAnimationEnd(Animation animation) {}
+                        @Override public void onAnimationEnd(Animation animation) {
+                            view.setAlpha(1);
+                        }
 
 
                         @Override public void onAnimationRepeat(Animation animation) {}

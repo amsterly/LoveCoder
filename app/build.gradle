@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
-
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
     buildToolsVersion rootProject.ext.android.buildToolsVersion
@@ -10,7 +9,7 @@ android {
         targetSdkVersion rootProject.ext.android.targetSdkVersion
         versionCode rootProject.ext.android.versionCode
         versionName rootProject.ext.android.versionName
-        // multiDexEnabled true
+        multiDexEnabled true
     }
     signingConfigs {
         release {
@@ -45,9 +44,12 @@ android {
 //    compile 'com.android.support:appcompat-v7:25.2.0'
         debugCompile rootProject.ext.dependencies["leakcanary-android"]
         releaseCompile rootProject.ext.dependencies["leakcanary-android-no-op"]
+
+
         compile rootProject.ext.dependencies["appcompat-v7"]
         compile rootProject.ext.dependencies["design"]
         compile rootProject.ext.dependencies["gridlayout-v7"]
+        compile rootProject.ext.dependencies["recyclerview"]
         compile rootProject.ext.dependencies["retrofit2:converter-gson"]
         compile rootProject.ext.dependencies["retrofit2:adapter-rxjava"]
         compile rootProject.ext.dependencies["rxandroid"]
@@ -58,5 +60,14 @@ android {
         compile rootProject.ext.dependencies["photoview"]
         compile rootProject.ext.dependencies["bilibili:DanmakuFlameMaster"]
         compile rootProject.ext.dependencies["bilibili:ndkbitmap-armv7a"]
+        compile rootProject.ext.dependencies["calligraphy"]
+        compile rootProject.ext.dependencies["numberprogressbar"]
+        compile rootProject.ext.dependencies["otto"]
+        compile rootProject.ext.dependencies["nineoldandroids"]
+//        compile rootProject.ext.dependencies["easyvideoplayer"]
     }
+}
+
+dependencies {
+    compile project(':smooth-app-bar-layout')
 }

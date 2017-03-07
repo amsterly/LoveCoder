@@ -7,6 +7,9 @@
 
 
 
+    <string name="title_activity_picture">PictureActivity</string>
+    <string name="title_activity_gank">GankActivity</string>
+
     <!--action-->
     <string name="action_subject">今日肥皂家话题</string>
     <string name="action_github_login">登录 GitHub 帐号</string>

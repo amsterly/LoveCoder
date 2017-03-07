@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by drakeet on 6/20/15.
  */
 public class Dates {
 

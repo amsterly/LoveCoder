@@ -39,6 +39,7 @@ public  class SwipeRefreshBaseActivity extends BaseActivity<IMain, MainPresenter
     @Override public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
         ButterKnife.bind(this);
+//        mSwipeRefreshLayout.setProgressViewOffset(false,100,300);
     }
     @Override
     protected MainPresenter createPresenter() {
@@ -54,7 +55,8 @@ public  class SwipeRefreshBaseActivity extends BaseActivity<IMain, MainPresenter
 
     void trySetupSwipeRefresh() {
         if (mSwipeRefreshLayout != null) {
-//            mSwipeRefreshLayout.setProgressViewOffset(false, 0, 100);
+            mSwipeRefreshLayout.setProgressViewOffset(false, 100, 300);
+            mSwipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
 //            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
             mSwipeRefreshLayout.setColorSchemeResources(R.color.refresh_progress_3,
                     R.color.refresh_progress_2, R.color.refresh_progress_1);
@@ -93,6 +95,7 @@ public  class SwipeRefreshBaseActivity extends BaseActivity<IMain, MainPresenter
 
     @Override public void setProgressViewOffset(boolean scale, int start, int end) {
         mSwipeRefreshLayout.setProgressViewOffset(scale, start, end);
+//        mSwipeRefreshLayout.setProgressViewOffset(false,100,300);
     }
 
 

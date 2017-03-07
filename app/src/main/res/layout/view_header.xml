@@ -2,17 +2,58 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/headerView"
-    app:layout_collapseMode="parallax"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
+    android:layout_height="300dp"
     android:background="#000"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    app:layout_collapseMode="parallax">
+    <!--<com.afollestad.easyvideoplayer.EasyVideoPlayer xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:id="@+id/player"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" />-->
+    <ImageView
+        android:id="@+id/main_bg"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:fitsSystemWindows="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_day"
+        app:layout_collapseMode="parallax"
+        app:layout_collapseParallaxMultiplier="0.7" />
 
-    <VideoView
-        android:id="@+id/video_view"
+    <LinearLayout
+        android:id="@+id/container_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="120dp"
+        android:orientation="horizontal"
+        app:layout_collapseMode="parallax">
+
+        <TextView
+            android:id="@+id/main_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="--°"
+            android:textAppearance="@style/TextAppearance.RobotoThinPath"
+            android:textColor="@color/main_background"
+            android:textSize="@dimen/text_size_main_special" />
+
+        <TextView
+            android:id="@+id/main_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/main_background"
+            android:textSize="@dimen/text_size_appbar_title" />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_hours_forecast_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_gravity="bottom"
+        android:background="@color/disable_or_hint_white" />
 
     <master.flame.danmaku.ui.widget.DanmakuView
         android:id="@+id/danmaku_view"

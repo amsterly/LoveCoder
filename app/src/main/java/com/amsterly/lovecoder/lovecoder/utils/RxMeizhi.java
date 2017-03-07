@@ -34,7 +34,6 @@ import rx.schedulers.Schedulers;
 
 /**
  * 简单重构了下，并且修复了重复插入图片问题
- * Created by drakeet on 8/10/15.
  */
 public class RxMeizhi {
 

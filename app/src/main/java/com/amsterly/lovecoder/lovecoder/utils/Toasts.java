@@ -23,7 +23,6 @@ import android.content.Context;
 import android.widget.Toast;
 
 /**
- * Created by drakeet on 9/27/14.
  */
 public class Toasts {
 

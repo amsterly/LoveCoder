@@ -39,9 +39,7 @@ import com.bumptech.glide.request.target.SizeReadyCallback;
 import java.util.List;
 
 
-/**
- * Created by drakeet on 6/20/15.
- */
+
 public class MeizhiListAdapter
         extends RecyclerView.Adapter<MeizhiListAdapter.ViewHolder> {
 

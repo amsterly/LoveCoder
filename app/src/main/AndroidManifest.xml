@@ -29,6 +29,19 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.activity.WebActivity"
+            android:launchMode="singleTask"/>
+
+        <activity
+            android:name=".ui.activity.GankActivity"
+            android:label="@string/title_activity_gank"
+            android:hardwareAccelerated="true"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoReDrawWindowsBackground"
+            android:launchMode="singleTask"/>
     </application>
 
 </manifest>

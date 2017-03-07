@@ -2,7 +2,6 @@ package com.amsterly.lovecoder.lovecoder.ui.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +25,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
+//import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.amsterly.lovecoder.lovecoder.App;
 import com.amsterly.lovecoder.lovecoder.R;
 import com.amsterly.lovecoder.lovecoder.func.OnMeizhiTouchListener;
@@ -37,7 +37,6 @@ import com.amsterly.lovecoder.lovecoder.presenter.home.MainPresenter;
 import com.amsterly.lovecoder.lovecoder.ui.activity.base.SwipeRefreshBaseActivity;
 import com.amsterly.lovecoder.lovecoder.ui.adapter.MeizhiListAdapter;
 import com.amsterly.lovecoder.lovecoder.utils.Dates;
-import com.amsterly.lovecoder.lovecoder.utils.Utils;
 import com.litesuits.orm.db.assit.QueryBuilder;
 import com.litesuits.orm.db.model.ConflictAlgorithm;
 import com.squareup.picasso.Callback;
@@ -88,10 +87,13 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
     RecyclerView recyclerview;
     @Bind(R.id.main_fab)
     FloatingActionButton mainFab;
-    @Bind(R.id.video_view)
-    VideoView videoView;
+    //    @Bind(R.id.video_view)
+//    VideoView videoView;
     @Bind(R.id.danmaku_view)
     DanmakuView danmakuView;
+//    @Bind(R.id.player)
+//    EasyVideoPlayer player;
+
     private ActionBarDrawerToggle mDrawerToggle;
     private final static String TAG = "MainActivity";
     private MeizhiListAdapter mMeizhiListAdapter;
@@ -125,15 +127,21 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
     }
 
     private void initDanmaku() {
-        videoView.setVideoURI(Uri.parse("http://player.youku.com/player.php/sid/XMjUwOTQzODg3Ng==/v.swf"));
-        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-//                Log.i(TAG, "MediaPlayer onError: "+mp.);
-                return false;
-            }
-        });
+//        Uri uri=Uri.parse("android:resource://"+getApplication().getPackageName()+"/"+R.raw.hashiqi);
+//        videoView.setVideoPath(uri.toString())  ;
+        //http://
+//        videoView.setVideoURI(Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"));
+//        videoView.setVideoURI(Uri.parse("http://player.youku.com/player.php/sid/XMjUwOTQzODg3Ng==/v.swf"));
+//        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+//            @Override
+//            public boolean onError(MediaPlayer mp, int what, int extra) {
+////                Log.i(TAG, "MediaPlayer onError: "+mp.);
+//                return false;
+//            }
+//        });
 //        videoView.start();
+//        player.setSource(Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"));
+//        player.start();
         danmakuView.enableDanmakuDrawingCache(true);
         danmakuView.setCallback(new DrawHandler.Callback() {
             @Override
@@ -169,7 +177,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(showDanmaku) {
+                while (showDanmaku) {
                     int time = new Random().nextInt(500);
                     String content = "" + time + time;
                     addDanmaku(content, false);
@@ -182,12 +190,12 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
             }
         }).start();
     }
+
     /**
      * 向弹幕View中添加一条弹幕
-     * @param content
-     *          弹幕的具体内容
-     * @param  withBorder
-     *          弹幕是否有边框
+     *
+     * @param content    弹幕的具体内容
+     * @param withBorder 弹幕是否有边框
      */
     private void addDanmaku(String content, boolean withBorder) {
         BaseDanmaku danmaku = danmakuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
@@ -201,6 +209,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         }
         danmakuView.addDanmaku(danmaku);
     }
+
     private void initParam() {
         mAppBarLayout.addOnOffsetChangedListener(this);
 
@@ -264,6 +273,8 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         if (danmakuView != null && danmakuView.isPrepared()) {
             danmakuView.pause();
         }
+//        if (player != null)
+//            player.pause();
 
     }
 
@@ -302,18 +313,8 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        if(verticalOffset==0)
-        {
-            Log.i(TAG, "onOffsetChanged: verticalOffset"+verticalOffset);
-//
-            danmakuView.start();
-            videoView.start();
-        }
-        else if(Math.abs(verticalOffset)==appBarLayout.getTotalScrollRange())
-        {
-            Log.i(TAG, "onOffsetChanged: getTotalScrollRange"+appBarLayout.getTotalScrollRange());
-            danmakuView.stop();
-            videoView.stopPlayback();
+        if (verticalOffset == 0) {
+        } else if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
         }
         mSwipeRefreshLayout.setEnabled(verticalOffset == 0);
         float alpha = (float) Math.abs(verticalOffset) / (float) appBarLayout.getTotalScrollRange() * 1.0f;
@@ -322,7 +323,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
 
 
     private void setupRecyclerView() {
-        final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3,
+        final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,
                 StaggeredGridLayoutManager.VERTICAL);
         recyclerview.setLayoutManager(layoutManager);
         mMeizhiListAdapter = new MeizhiListAdapter(this, mMeizhiList);
@@ -341,9 +342,10 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         return new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView rv, int dx, int dy) {
+                //当预加载量与最后一个完整看到的Item的位置之和>=每次请求的最大数时 请求加载新数据
                 boolean isBottom =
-                        layoutManager.findLastCompletelyVisibleItemPositions(new int[3])[1] >=
-                                mMeizhiListAdapter.getItemCount() - PRELOAD_SIZE;
+                        layoutManager.findLastCompletelyVisibleItemPositions(new int[2])[1]+ PRELOAD_SIZE >=
+                                mMeizhiListAdapter.getItemCount() ;
                 if (!mSwipeRefreshLayout.isRefreshing() && isBottom) {
                     if (!mIsFirstTimeTouchBottom) {
                         mSwipeRefreshLayout.setRefreshing(true);
@@ -458,10 +460,11 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         super.requestDataRefresh();
         mPage = 1;
         loadData(true);
-        addDanmaku("人家拿小拳拳捶你胸口！",true);
+        addDanmaku("人家拿小拳拳捶你胸口！", true);
     }
 
     private void saveMeizhis(List<Meizhi> meizhis) {
+        App.sDb.deleteAll(Meizhi.class);
         App.sDb.insert(meizhis, ConflictAlgorithm.Replace);
     }
 
@@ -502,9 +505,14 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
                     }
                 });
             } else if (v == card) {
-//                startGankActivity(meizhi.publishedAt);
+                startGankActivity(meizhi.publishedAt);
             }
         };
+    }
+    private void startGankActivity(Date publishedAt) {
+        Intent intent = new Intent(this, GankActivity.class);
+        intent.putExtra(GankActivity.EXTRA_GANK_DATE, publishedAt);
+        startActivity(intent);
     }
 
 

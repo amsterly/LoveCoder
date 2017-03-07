@@ -14,4 +14,10 @@
     <color name="refresh_progress_3">@color/colorPrimary</color>
     <color name="background_gank">@color/white</color>
     <color name="about_header_background">@color/colorPrimaryDark</color>
+
+    <color name="lite_blue">#ff359ff2</color>
+    <color name="disable_or_hint_white">#4Cffffff</color>
+    <color name="secondly_text_white">#ABffffff</color>
+    <color name="main_background">#FFFFFF</color>
+    <color name="dark_background">#f5f5f5</color>
 </resources>
