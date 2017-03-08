@@ -17,7 +17,7 @@
   ~ along with Meizhi.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<me.drakeet.meizhi.widget.LoveVideoView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.amsterly.lovecoder.lovecoder.ui.widget.LoveVideoView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/video_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

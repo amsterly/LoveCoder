@@ -106,7 +106,6 @@ public class GankActivity extends ToolbarActivity implements ViewPager.OnPageCha
         }
     }
 
-
     @Override protected void hideOrShowToolbar() {
         View toolbar = findViewById(R.id.toolbar_with_indicator);
         assert toolbar != null;

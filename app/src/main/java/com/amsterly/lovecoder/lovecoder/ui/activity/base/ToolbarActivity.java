@@ -23,20 +23,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.animation.DecelerateInterpolator;
 
 import com.amsterly.lovecoder.lovecoder.R;
+import com.amsterly.lovecoder.lovecoder.presenter.base.BasePresenter;
 import com.amsterly.lovecoder.lovecoder.presenter.home.PicturePresenter;
+import com.amsterly.lovecoder.lovecoder.ui.activity.PictureActivity;
+import com.amsterly.lovecoder.lovecoder.view.base.IBase;
 import com.amsterly.lovecoder.lovecoder.view.home.IPicture;
 
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
-
-public abstract class ToolbarActivity  extends BaseActivity<IPicture, PicturePresenter> implements IPicture {
+public abstract class ToolbarActivity<V,T extends BasePresenter<V>>  extends BaseActivity<V, T>  {
 
     abstract protected int provideContentViewId();
 
@@ -47,6 +46,7 @@ public abstract class ToolbarActivity  extends BaseActivity<IPicture, PicturePre
     protected AppBarLayout mAppBar;
     protected Toolbar mToolbar;
     protected boolean mIsHidden = false;
+
 
 
     @Override protected void onCreate(Bundle savedInstanceState) {

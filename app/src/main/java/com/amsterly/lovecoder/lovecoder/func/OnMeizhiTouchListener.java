@@ -24,9 +24,14 @@ import android.view.View;
 import com.amsterly.lovecoder.lovecoder.model.entity.Meizhi;
 
 
-/**
- * Created by drakeet on 7/1/15.
- */
+
 public interface OnMeizhiTouchListener {
+    /***
+     *
+     * @param v 当前view
+     * @param meizhiView 图片View
+     * @param card 外部卡片View
+     * @param meizhi bean
+     */
     void onTouch(View v, View meizhiView, View card, Meizhi meizhi);
 }

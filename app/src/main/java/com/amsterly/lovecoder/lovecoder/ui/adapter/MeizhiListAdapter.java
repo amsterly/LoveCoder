@@ -68,12 +68,13 @@ public class MeizhiListAdapter
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         Meizhi meizhi = mList.get(position);
         int limit = 48;
+        //字数限制
         String text = meizhi.desc.length() > limit ? meizhi.desc.substring(0, limit) +
                 "..." : meizhi.desc;
         viewHolder.meizhi = meizhi;
         viewHolder.titleView.setText(text);
         viewHolder.card.setTag(meizhi.desc);
-
+        //图片缓存
         Glide.with(mContext)
                 .load(meizhi.url)
                 .centerCrop()
