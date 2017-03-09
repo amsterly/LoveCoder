@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <!--定位-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -42,6 +45,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoReDrawWindowsBackground"
             android:launchMode="singleTask"/>
+
+
+        <service
+            android:name="com.amap.api.location.APSService">
+        </service>
+
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="d4cfc1d729097577433b40b3b4f8e264">
+        </meta-data>
     </application>
 
 </manifest>

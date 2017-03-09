@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -37,7 +38,7 @@ import rx.schedulers.Schedulers;
  */
 public class RxMeizhi {
 
-    public static Observable<Uri> saveImageAndGetPathObservable(Context context, String url, String title) {
+    public static Observable<Uri> saveImageAndGetPathObservable(final Context context,final  String url,final  String title) {
         return Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override public void call(Subscriber<? super Bitmap> subscriber) {
                 Bitmap bitmap = null;
@@ -52,28 +53,32 @@ public class RxMeizhi {
                 subscriber.onNext(bitmap);
                 subscriber.onCompleted();
             }
-        }).flatMap(bitmap -> {
-            File appDir = new File(Environment.getExternalStorageDirectory(), "Meizhi");
-            if (!appDir.exists()) {
-                appDir.mkdir();
-            }
-            String fileName = title.replace('/', '-') + ".jpg";
-            File file = new File(appDir, fileName);
-            try {
-                FileOutputStream outputStream = new FileOutputStream(file);
-                assert bitmap != null;
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                outputStream.flush();
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        }).flatMap(new Func1<Bitmap, Observable<Uri>>() {
+            @Override
+            public Observable<Uri> call(Bitmap bitmap) {
+                File appDir = new File(Environment.getExternalStorageDirectory(), "Meizhi");
+                if (!appDir.exists()) {
+                    appDir.mkdir();
+                }
+                String fileName = title.replace('/', '-') + ".jpg";
+                File file = new File(appDir, fileName);
+                try {
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    assert bitmap != null;
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-            Uri uri = Uri.fromFile(file);
-            // 通知图库更新
-            Intent scannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
-            context.sendBroadcast(scannerIntent);
-            return Observable.just(uri);
+                Uri uri = Uri.fromFile(file);
+                // 通知图库更新
+                Intent scannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
+                context.sendBroadcast(scannerIntent);
+                return Observable.just(uri);
+//                return null;
+            }
         }).subscribeOn(Schedulers.io());
     }
 }

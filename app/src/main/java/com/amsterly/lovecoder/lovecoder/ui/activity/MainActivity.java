@@ -2,7 +2,6 @@ package com.amsterly.lovecoder.lovecoder.ui.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,31 +14,36 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.VideoView;
+import android.widget.TextView;
 
-//import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.amsterly.lovecoder.lovecoder.App;
 import com.amsterly.lovecoder.lovecoder.R;
 import com.amsterly.lovecoder.lovecoder.func.OnMeizhiTouchListener;
-import com.amsterly.lovecoder.lovecoder.model.MeizhiData;
-import com.amsterly.lovecoder.lovecoder.model.entity.Gank;
+import com.amsterly.lovecoder.lovecoder.model.HoursForecastData;
 import com.amsterly.lovecoder.lovecoder.model.entity.Meizhi;
-import com.amsterly.lovecoder.lovecoder.model.休息视频Data;
+import com.amsterly.lovecoder.lovecoder.model.entity.WeatherEntity;
 import com.amsterly.lovecoder.lovecoder.presenter.home.MainPresenter;
 import com.amsterly.lovecoder.lovecoder.ui.activity.base.SwipeRefreshBaseActivity;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.AqiData;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.BaseRecyclerAdapter;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.DailyWeatherData;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.HourWeatherHolder;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.LifeIndexData;
 import com.amsterly.lovecoder.lovecoder.ui.adapter.MeizhiListAdapter;
-import com.amsterly.lovecoder.lovecoder.utils.Dates;
+import com.amsterly.lovecoder.lovecoder.ui.widget.MultiSwipeRefreshLayout;
+import com.amsterly.lovecoder.lovecoder.ui.widget.dynamicweather.BaseDrawer;
+import com.amsterly.lovecoder.lovecoder.ui.widget.dynamicweather.DynamicWeatherView;
 import com.amsterly.lovecoder.lovecoder.utils.Once;
+import com.amsterly.lovecoder.lovecoder.view.home.IMain;
 import com.litesuits.orm.db.assit.QueryBuilder;
-import com.litesuits.orm.db.model.ConflictAlgorithm;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -59,19 +63,16 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.ui.widget.DanmakuView;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 
-public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayout.OnOffsetChangedListener {
+import static com.amsterly.lovecoder.lovecoder.R.id.meizhi;
+
+//import com.afollestad.easyvideoplayer.EasyVideoPlayer;
+
+public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter> implements IMain, AppBarLayout.OnOffsetChangedListener {
 
 
-    @Bind(R.id.headerView)
-    RelativeLayout mHeaderView;
+//    @Bind(R.id.headerView)
+//    RelativeLayout mHeaderView;
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
     @Bind(R.id.collapse_toolbar)
@@ -92,6 +93,14 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
 //    VideoView videoView;
     @Bind(R.id.danmaku_view)
     DanmakuView danmakuView;
+    @Bind(R.id.main_dynamicweatherview)
+    DynamicWeatherView mainDynamicweatherview;
+    @Bind(R.id.main_hours_forecast_recyclerView)
+    RecyclerView mainHoursForecastRecyclerView;
+    @Bind(R.id.main_temp)
+    TextView mainTemp;
+    @Bind(R.id.main_info)
+    TextView mainInfo;
 //    @Bind(R.id.player)
 //    EasyVideoPlayer player;
 
@@ -115,6 +124,12 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
             return new Danmakus();
         }
     };
+    private BaseRecyclerAdapter mHoursForecastAdapter;
+    private String mTemperature;
+    private String mWeatherStatus;
+
+    @Bind(R.id.swipe_container)
+    public MultiSwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +138,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         ButterKnife.bind(this);
         initParam();
         setupRecyclerView();
+        setupHoursForecast();
         initDanmaku();
 
     }
@@ -212,6 +228,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
     }
 
     private void initParam() {
+        mainDynamicweatherview.setDrawerType(BaseDrawer.Type.RAIN_SNOW_D);
         mAppBarLayout.addOnOffsetChangedListener(this);
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(
@@ -254,7 +271,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         query.appendOrderDescBy("publishedAt");
         query.limit(0, 10);
         if (App.sDb.query(query) != null)
-            mMeizhiList.addAll(App.sDb.query(query));
+            mMeizhiList.addAll(App.sDb.<Meizhi>query(query));
     }
 
 
@@ -274,6 +291,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         if (danmakuView != null && danmakuView.isPrepared()) {
             danmakuView.pause();
         }
+        mainDynamicweatherview.onPause();
 //        if (player != null)
 //            player.pause();
 
@@ -285,6 +303,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         if (danmakuView != null && danmakuView.isPrepared() && danmakuView.isPaused()) {
             danmakuView.resume();
         }
+        mainDynamicweatherview.onResume();
 //        mAppBarLayout.setExpanded(false, true);
 //        mAppBarLayout.setExpanded(true, true);
     }
@@ -298,6 +317,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
             danmakuView.release();
             danmakuView = null;
         }
+        mainDynamicweatherview.onDestroy();
     }
 
     @Override
@@ -307,9 +327,12 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
             @Override
             public void run() {
                 mPresenter.loadData(true);
+
+                mPresenter.updateDefaultWeather();
             }
         }, 358);
         ;
+
     }
 
     @Override
@@ -317,8 +340,10 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         if (verticalOffset == 0) {
         } else if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
         }
+        if(mSwipeRefreshLayout!=null)
         mSwipeRefreshLayout.setEnabled(verticalOffset == 0);
         float alpha = (float) Math.abs(verticalOffset) / (float) appBarLayout.getTotalScrollRange() * 1.0f;
+       if(mToolbar!=null)
         mToolbar.setAlpha(alpha);
     }
 
@@ -329,14 +354,30 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
         recyclerview.setLayoutManager(layoutManager);
         mMeizhiListAdapter = new MeizhiListAdapter(this, mMeizhiList);
         recyclerview.setAdapter(mMeizhiListAdapter);
-        new Once(this).show("tip_guide_6", () -> {
-            Snackbar.make(recyclerview, getString(R.string.tip_guide), Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.i_know, v -> {
-                    })
-                    .show();
+        new Once(this).show("tip_guide_6", new Once.OnceCallback() {
+            @Override
+            public void onOnce() {
+                Snackbar.make(recyclerview, getString(R.string.tip_guide), Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.i_know, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        })
+                        .show();
+            }
         });
         recyclerview.addOnScrollListener(getOnBottomListener(layoutManager));
         mMeizhiListAdapter.setOnMeizhiTouchListener(getOnMeizhiTouchListener());
+    }
+
+    private void setupHoursForecast() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mainHoursForecastRecyclerView.setLayoutManager(linearLayoutManager);
+        mHoursForecastAdapter = new BaseRecyclerAdapter(this);
+        mHoursForecastAdapter.registerHolder(HourWeatherHolder.class, R.layout.item_hour_forecast);
+        mainHoursForecastRecyclerView.setAdapter(mHoursForecastAdapter);
     }
 
     RecyclerView.OnScrollListener getOnBottomListener(final StaggeredGridLayoutManager layoutManager) {
@@ -407,6 +448,7 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
     public void notifyDataSetChanged() {
         mMeizhiListAdapter.notifyDataSetChanged();
     }
+
     @Override
     public void loadError(Throwable throwable) {
         throwable.printStackTrace();
@@ -417,29 +459,70 @@ public class MainActivity extends SwipeRefreshBaseActivity implements AppBarLayo
                 .show();
     }
 
+    @Override
+    public void onBasicInfo(WeatherEntity.BasicEntity basicData, List<HoursForecastData> hoursForecastDatas, boolean isLocationCity) {
+//        mLocationTv.setCompoundDrawables(isLocationCity ? mDrawableLocation : null, null, null, null);
+//        mLocationTv.setText(basicData.getCity());
+//
+//        updateSucceed(String.format(getString(R.string.post), TimeUtil.getTimeTips(basicData.getTime())));
+
+        mTemperature = basicData.getTemp();
+        mWeatherStatus = basicData.getWeather();
+        mainTemp.setText(mTemperature);
+        mainInfo.setText(mWeatherStatus);
+//
+//        if (TimeUtil.isNight()) {
+//            if (Constants.sunny(mWeatherStatus)) {
+//                mMainBgIv.setImageResource(R.mipmap.bg_night);
+//            } else {
+//                mMainBgIv.setImageResource(R.mipmap.bg_night_dark);
+//            }
+//        } else {
+//            mMainBgIv.setImageResource(R.mipmap.bg_day);
+//        }
+
+        mHoursForecastAdapter.setData(hoursForecastDatas);
+    }
+
+    @Override
+    public void onMoreInfo(AqiData aqiData, List<DailyWeatherData> dailyForecastDatas, LifeIndexData lifeIndexData) {
+
+    }
+
+    @Override
+    public void onRefreshing(boolean refreshing) {
+
+    }
+
 
     private OnMeizhiTouchListener getOnMeizhiTouchListener() {
-        return (v, meizhiView, card, meizhi) -> {
-            if (meizhi == null) return;
-            if (v == meizhiView && !mMeizhiBeTouched) {
-                mMeizhiBeTouched = true;
-                Picasso.with(this).load(meizhi.url).fetch(new Callback() {
+        return new OnMeizhiTouchListener() {
+            @Override
+            public void onTouch(final View v, final View meizhiView, final View card, final Meizhi meizhi) {
+                if (meizhi == null) return;
+                if (v == meizhiView && !mMeizhiBeTouched) {
+                    mMeizhiBeTouched = true;
+                    Picasso.with(MainActivity.this).load(meizhi.url).fetch(new Callback() {
 
-                    @Override
-                    public void onSuccess() {
-                        mMeizhiBeTouched = false;
-                        startPictureActivity(meizhi, meizhiView);
-                    }
+                        @Override
+                        public void onSuccess() {
+                            mMeizhiBeTouched = false;
+                            startPictureActivity(meizhi, meizhiView);
+                        }
 
 
-                    @Override
-                    public void onError() {
-                        mMeizhiBeTouched = false;
-                    }
-                });
-            } else if (v == card) {
-                startGankActivity(meizhi.publishedAt);
+                        @Override
+                        public void onError() {
+                            mMeizhiBeTouched = false;
+                        }
+                    });
+                } else if (v == card) {
+                    startGankActivity(meizhi.publishedAt);
+                }
             }
+
+            ;
+
         };
     }
 

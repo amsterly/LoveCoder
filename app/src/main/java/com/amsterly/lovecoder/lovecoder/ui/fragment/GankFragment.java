@@ -189,12 +189,18 @@ public class GankFragment extends BaseFragment<IGank,GankPresenter> implements I
                 } else {
                     mVideoView = (LoveVideoView) mVideoViewStub.inflate();
                     mIsVideoViewInflated = true;
-                    String tip = getString(R.string.tip_video_play);
+                    final String tip = getString(R.string.tip_video_play);
 //                     @formatter:off
-                    new Once(mVideoView.getContext()).show(tip, () ->
+                    new Once(mVideoView.getContext()).show(tip, new Once.OnceCallback() {
+                        @Override
+                        public void onOnce() {
                             Snackbar.make(mVideoView, tip, Snackbar.LENGTH_INDEFINITE)
-                                    .setAction(R.string.i_know, v -> {})
-                                    .show());
+                                    .setAction(R.string.i_know, null)
+                                    .show();
+                        }
+                    });
+
+
 //                     @formatter:on
                 }
                 if (mGankList.size() > 0 && mGankList.get(0).type.equals("休息视频")) {

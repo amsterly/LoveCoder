@@ -1,6 +1,8 @@
 package com.amsterly.lovecoder.lovecoder.presenter.home;
 
+import com.amsterly.lovecoder.lovecoder.model.DGankData;
 import com.amsterly.lovecoder.lovecoder.model.GankData;
+import com.amsterly.lovecoder.lovecoder.model.entity.DGank;
 import com.amsterly.lovecoder.lovecoder.model.entity.Gank;
 import com.amsterly.lovecoder.lovecoder.network.DrakeetFactory;
 import com.amsterly.lovecoder.lovecoder.presenter.base.BasePresenter;
@@ -21,6 +23,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Created by lvwenbo on 2017/3/8.
@@ -40,31 +44,86 @@ public class GankPresenter extends BasePresenter<IGank> {
         // @formatter:off
         Subscription mSubscription = SwipeRefreshBaseActivity.sGankIO
                 .getGankData(getView().getYear(), getView().getMonth(), getView().getDay())
-                .map(data -> data.results)
-                .map(this::addAllResults)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> {
-                    if (list.isEmpty()) {
-                        showEmptyView();
-                    } else {
-                        getView().notifyDataSetChanged();
-
+                .map(new Func1<GankData, GankData.Result>() {
+                    @Override
+                    public GankData.Result call(GankData gankData) {
+                        return gankData.results;
                     }
-                }, Throwable::printStackTrace);
+                })
+                .map(new Func1<GankData.Result, List<Gank>>() {
+                    @Override
+                    public List<Gank> call(GankData.Result result) {
+                        return addAllResults(result);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Gank>>() {
+                    @Override
+                    public void call(List<Gank> ganks) {
+                        if (ganks.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            getView().notifyDataSetChanged();
+
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                });
         // @formatter:on
     }
 
 
-    public  void loadVideoPreview() {
+//    public  void loadVideoPreview() {
+//        String where = String.format("{\"tag\":\"%d-%d-%d\"}", getView().getYear(), getView().getMonth(), getView().getDay());
+//        DrakeetFactory.getDrakeetSingleton()
+//                .getDGankData(where)
+//                .map(dGankData -> dGankData.results)
+//                .single(dGanks -> dGanks.size() > 0)
+//                .map(dGanks -> dGanks.get(0))
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(dGank -> startPreview(dGank.preview),
+//                        throwable -> getOldVideoPreview(new OkHttpClient()));
+//    }
+
+    private void loadVideoPreview() {
         String where = String.format("{\"tag\":\"%d-%d-%d\"}", getView().getYear(), getView().getMonth(), getView().getDay());
         DrakeetFactory.getDrakeetSingleton()
                 .getDGankData(where)
-                .map(dGankData -> dGankData.results)
-                .single(dGanks -> dGanks.size() > 0)
-                .map(dGanks -> dGanks.get(0))
+                .map(new Func1<DGankData, List<DGank>>() {
+                    @Override
+                    public List<DGank> call(DGankData dGankData) {
+                        return dGankData.results;
+                    }
+                })
+                .single(new Func1<List<DGank>, Boolean>() {
+                    @Override
+                    public Boolean call(List<DGank> dGanks) {
+                        return dGanks.size() > 0;
+                    }
+                })
+                .map(new Func1<List<DGank>, DGank>() {
+                    @Override
+                    public DGank call(List<DGank> dGanks) {
+                        return dGanks.get(0);
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dGank -> startPreview(dGank.preview),
-                        throwable -> getOldVideoPreview(new OkHttpClient()));
+                .subscribe(new Action1<DGank>() {
+                               @Override
+                               public void call(DGank dGank) {
+                                   startPreview(dGank.preview);
+                               }
+                           },
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                getOldVideoPreview(new OkHttpClient());
+                            }
+                        } );
     }
 
     public  void getOldVideoPreview(OkHttpClient client) {
@@ -87,14 +146,29 @@ public class GankPresenter extends BasePresenter<IGank> {
     }
 
 
-    public  void startPreview(String preview) {
+//    public  void startPreview(String preview) {
+//
+//        if (preview != null && getView().getVideoImageView() != null) {
+//            // @formatter:off
+//            getView().getVideoImageView().post(() ->
+//                    Glide.with(getView().getVideoImageView().getContext())
+//                            .load(preview)
+//                            .into(getView().getVideoImageView()));
+//            // @formatter:on
+//        }
+//    }
+    private void startPreview(final String preview) {
         GankFragment.mVideoPreviewUrl = preview;
         if (preview != null && getView().getVideoImageView() != null) {
             // @formatter:off
-            getView().getVideoImageView().post(() ->
+            getView().getVideoImageView().post(new Runnable() {
+                @Override
+                public void run() {
                     Glide.with(getView().getVideoImageView().getContext())
                             .load(preview)
-                            .into(getView().getVideoImageView()));
+                            .into(getView().getVideoImageView());
+                }
+            });
             // @formatter:on
         }
     }

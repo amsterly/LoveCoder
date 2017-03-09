@@ -34,6 +34,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.amsterly.lovecoder.lovecoder.R;
 import com.amsterly.lovecoder.lovecoder.presenter.home.PicturePresenter;
@@ -99,13 +100,21 @@ public class WebActivity extends ToolbarActivity {
 
         mWebView.loadUrl(mUrl);
 
-        mTextSwitcher.setFactory(() -> {
-            TextView textView = new TextView(this);
-            textView.setTextAppearance(this, R.style.WebTitle);
-            textView.setSingleLine(true);
-            textView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-            textView.postDelayed(() -> textView.setSelected(true), 1738);
-            return textView;
+        mTextSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                  final TextView textView = new TextView(WebActivity.this);
+                textView.setTextAppearance(WebActivity.this, R.style.WebTitle);
+                textView.setSingleLine(true);
+                textView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+                textView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        textView.setSelected(true);
+                    }
+                }, 1738);
+                return textView;
+            }
         });
         mTextSwitcher.setInAnimation(this, android.R.anim.fade_in);
         mTextSwitcher.setOutAnimation(this, android.R.anim.fade_out);

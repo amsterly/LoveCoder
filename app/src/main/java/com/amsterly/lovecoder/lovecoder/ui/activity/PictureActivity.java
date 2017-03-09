@@ -2,6 +2,7 @@ package com.amsterly.lovecoder.lovecoder.ui.activity;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.amsterly.lovecoder.lovecoder.R;
@@ -34,7 +36,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 /**
  * create by lvwenbo
  */
-public class PictureActivity extends ToolbarActivity {
+public class PictureActivity extends ToolbarActivity<IPicture, PicturePresenter> implements IPicture {
 
 
     public static final String EXTRA_IMAGE_URL = "image_url";
@@ -47,12 +49,14 @@ public class PictureActivity extends ToolbarActivity {
     PhotoViewAttacher mPhotoViewAttacher;
     String mImageUrl, mImageTitle;
 
-     @Override protected int provideContentViewId() {
+    @Override
+    protected int provideContentViewId() {
         return R.layout.activity_picture;
     }
 
 
-    @Override public boolean canBack() {
+    @Override
+    public boolean canBack() {
         return true;
     }
 
@@ -71,7 +75,8 @@ public class PictureActivity extends ToolbarActivity {
     }
 
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         parseIntent();
@@ -85,21 +90,36 @@ public class PictureActivity extends ToolbarActivity {
 
     private void setupPhotoAttacher() {
         mPhotoViewAttacher = new PhotoViewAttacher(mImageView);
-        mPhotoViewAttacher.setOnViewTapListener((view, v, v1) -> hideOrShowToolbar());
+        mPhotoViewAttacher.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
+            @Override
+            public void onViewTap(View view, float x, float y) {
+                hideOrShowToolbar();
+            }
+        });
         // @formatter:off
-        mPhotoViewAttacher.setOnLongClickListener(v -> {
-            new AlertDialog.Builder(PictureActivity.this)
-                    .setMessage(getString(R.string.ask_saving_picture))
-                    .setNegativeButton(android.R.string.cancel,
-                            (dialog, which) -> dialog.dismiss())
-                    .setPositiveButton(android.R.string.ok,
-                            (dialog, which) -> {
-                                saveImageToGallery();
+        mPhotoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                new AlertDialog.Builder(PictureActivity.this)
+                        .setMessage(getString(R.string.ask_saving_picture))
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                            })
-                    .show();
-            // @formatter:on
-            return true;
+                            }
+                        })
+                        .setPositiveButton(android.R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        saveImageToGallery();
+                                        dialog.dismiss();
+                                    }
+                                })
+                        .show();
+                return true;
+            }
         });
     }
 
@@ -108,25 +128,36 @@ public class PictureActivity extends ToolbarActivity {
         // @formatter:off
         Subscription s = RxMeizhi.saveImageAndGetPathObservable(this, mImageUrl, mImageTitle)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(uri -> {
-                    File appDir = new File(Environment.getExternalStorageDirectory(), "Meizhi");
-                    String msg = String.format(getString(R.string.picture_has_save_to),
-                            appDir.getAbsolutePath());
-                    Toasts.showShort(msg);
-                }, error -> Toasts.showLong(error.getMessage() + "\n再试试..."));
+                .subscribe(new Action1<Uri>() {
+                    @Override
+                    public void call(Uri uri) {
+                        File appDir = new File(Environment.getExternalStorageDirectory(), "Meizhi");
+                        String msg = String.format(getString(R.string.picture_has_save_to),
+                                appDir.getAbsolutePath());
+                        Toasts.showShort(msg);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toasts.showLong(throwable.getMessage() + "\n再试试...");
+                    }
+
+                });
         // @formatter:on
         addSubscription(s);
     }
 
 
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_picture, menu);
         // TODO: 把图片的一些信息，比如 who，加载到 Overflow 当中
         return true;
     }
 
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_share:
@@ -139,7 +170,13 @@ public class PictureActivity extends ToolbarActivity {
                                                    getString(R.string.share_meizhi_to));
                                        }
                                    },
-                                error -> Toasts.showLong(error.getMessage()));
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable throwable) {
+                                        Toasts.showLong(throwable.getMessage());
+                                    }
+                                }
+                        );
                 return true;
             case R.id.action_save:
                 saveImageToGallery();
@@ -150,19 +187,22 @@ public class PictureActivity extends ToolbarActivity {
     }
 
 
-    @Override public void onResume() {
+    @Override
+    public void onResume() {
         super.onResume();
 //        MobclickAgent.onResume(this);
     }
 
 
-    @Override public void onPause() {
+    @Override
+    public void onPause() {
         super.onPause();
 //        MobclickAgent.onPause(this);
     }
 
 
-    @Override protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
         mPhotoViewAttacher.cleanup();
         ButterKnife.unbind(this);

@@ -4,8 +4,8 @@
     android:id="@+id/headerView"
     android:layout_width="match_parent"
     android:layout_height="300dp"
-    android:background="#000"
     android:fitsSystemWindows="true"
+
     app:layout_collapseMode="parallax">
     <ImageView
         android:id="@+id/main_bg"
@@ -13,7 +13,6 @@
         android:layout_height="400dp"
         android:fitsSystemWindows="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_day"
         app:layout_collapseMode="parallax"
         app:layout_collapseParallaxMultiplier="0.7" />
 

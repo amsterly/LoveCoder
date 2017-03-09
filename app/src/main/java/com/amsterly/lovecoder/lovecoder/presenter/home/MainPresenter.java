@@ -3,8 +3,11 @@ package com.amsterly.lovecoder.lovecoder.presenter.home;
 
 import com.amsterly.lovecoder.lovecoder.App;
 import com.amsterly.lovecoder.lovecoder.model.MeizhiData;
+import com.amsterly.lovecoder.lovecoder.model.ModelManager;
 import com.amsterly.lovecoder.lovecoder.model.entity.Gank;
 import com.amsterly.lovecoder.lovecoder.model.entity.Meizhi;
+import com.amsterly.lovecoder.lovecoder.model.weather.CityModel;
+import com.amsterly.lovecoder.lovecoder.model.weather.WeatherModel;
 import com.amsterly.lovecoder.lovecoder.model.休息视频Data;
 import com.amsterly.lovecoder.lovecoder.ui.activity.MainActivity;
 import com.amsterly.lovecoder.lovecoder.utils.Dates;
@@ -30,43 +33,52 @@ import static com.amsterly.lovecoder.lovecoder.ui.activity.base.SwipeRefreshBase
  * create by lvwenbo
  */
 public class MainPresenter extends BasePresenter<IMain> {
+    private final WeatherModel mWeatherModel;
     private IMain iview;
 
     public MainPresenter(IMain main) {
         this.attachView(main);
         iview = getView();
+        mCityModel = ModelManager.getModel(CityModel.class);
+        mWeatherModel = ModelManager.getModel(WeatherModel.class);
     }
 
     public void loadData() {
         loadData(/* clean */false);
     }
 
-    public void loadData(boolean clean) {
+
+    public  void loadData(final boolean clean) {
         MainActivity.mLastVideoIndex = 0;
         // @formatter:off
         Subscription s = Observable
                 .zip(sGankIO.getMeizhiData(MainActivity.mPage),
                         sGankIO.get休息视频Data(MainActivity.mPage),
-                        this::createMeizhiDataWith休息视频Desc)//将视频的Decs分别加入每个图片的字段中
+                        new Func2<MeizhiData, 休息视频Data, MeizhiData>() {
+                            @Override
+                            public MeizhiData call(MeizhiData data, 休息视频Data love) {
+                                return createMeizhiDataWith休息视频Desc(data, love);
+                            }
+                        })
                 .map(new Func1<MeizhiData, List<Meizhi>>() {
                     @Override
                     public List<Meizhi> call(MeizhiData meizhiData) {
                         return meizhiData.results;
                     }
                 })
-                .flatMap(new Func1<List<Meizhi>, Observable<? extends Meizhi>>() {//遍历
+                .flatMap(new Func1<List<Meizhi>, Observable<? extends Meizhi>>() {
                     @Override
                     public Observable<? extends Meizhi> call(List<Meizhi> iterable) {
                         return Observable.from(iterable);
                     }
                 })
-                .toSortedList(new Func2<Meizhi, Meizhi, Integer>() {//按发表日期排序
+                .toSortedList(new Func2<Meizhi, Meizhi, Integer>() {
                     @Override
                     public Integer call(Meizhi meizhi1, Meizhi meizhi2) {
                         return meizhi2.publishedAt.compareTo(meizhi1.publishedAt);
                     }
                 })
-                .doOnNext(new Action1<List<Meizhi>>() {//图片缓存存入数据库
+                .doOnNext(new Action1<List<Meizhi>>() {
                     @Override
                     public void call(List<Meizhi> meizhis) {
                         saveMeizhis(meizhis);
@@ -76,7 +88,7 @@ public class MainPresenter extends BasePresenter<IMain> {
                 .finallyDo(new Action0() {
                     @Override
                     public void call() {
-                        getView().setRefresh(false);
+                       getView().setRefresh(false);
                     }
                 })
                 .subscribe(new Action1<List<Meizhi>>() {
@@ -87,7 +99,12 @@ public class MainPresenter extends BasePresenter<IMain> {
                         getView().notifyDataSetChanged();
                         getView().setRefresh(false);
                     }
-                }, throwable -> getView().loadError(throwable));
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        getView().loadError(throwable);
+                    }
+                });
         // @formatter:on
         addSubscription(s);
     }
@@ -117,5 +134,19 @@ public class MainPresenter extends BasePresenter<IMain> {
             }
         }
         return videoDesc;
+    }
+
+
+    //下面是天气
+
+    private CityModel mCityModel;
+    public void updateDefaultWeather() {
+
+        String defaultCity = mCityModel.getDefaultId();
+        getWeather(defaultCity);
+    }
+    private void getWeather(final String cityId) {
+        getView().onRefreshing(true);
+        mWeatherModel.updateWeather(cityId);
     }
 }

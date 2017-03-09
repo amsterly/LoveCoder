@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.amsterly.lovecoder.lovecoder.utils.Toasts;
+import com.google.gson.Gson;
 import com.litesuits.orm.LiteOrm;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -16,7 +17,7 @@ public class App extends Application {
     private static final String DB_NAME = "lovecoder.db";
     public static Context sContext;
     public static LiteOrm sDb;
-
+    private static Gson sGson = new Gson();
     @Override
     public void onCreate() {
         super.onCreate();
@@ -28,5 +29,8 @@ public class App extends Application {
         if (BuildConfig.DEBUG) {
             sDb.setDebugged(true);
         }
+    }
+    public static Gson getGson() {
+        return sGson;
     }
 }

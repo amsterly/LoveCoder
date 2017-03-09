@@ -25,6 +25,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
 import com.amsterly.lovecoder.lovecoder.R;
@@ -58,7 +59,12 @@ public abstract class ToolbarActivity<V,T extends BasePresenter<V>>  extends Bas
             throw new IllegalStateException(
                     "The subclass of ToolbarActivity must contain a toolbar.");
         }
-        mToolbar.setOnClickListener(v -> onToolbarClick());
+        mToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onToolbarClick();
+            }
+        });
         setSupportActionBar(mToolbar);
 
         if (canBack()) {
