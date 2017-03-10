@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amsterly.lovecoder.lovecoder.App;
@@ -73,8 +74,6 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
     //    @Bind(R.id.headerView)
 //    RelativeLayout mHeaderView;
-    @Bind(R.id.toolbar)
-    Toolbar mToolbar;
     @Bind(R.id.collapse_toolbar)
     CollapsingToolbarLayout mCollapseToolbar;
     @Bind(R.id.appBarLayout)
@@ -91,8 +90,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     FloatingActionButton mainFab;
     //    @Bind(R.id.video_view)
 //    VideoView videoView;
-    @Bind(R.id.danmaku_view)
-    DanmakuView danmakuView;
+
     @Bind(R.id.main_dynamicweatherview)
     DynamicWeatherView mainDynamicweatherview;
     @Bind(R.id.main_hours_forecast_recyclerView)
@@ -103,6 +101,12 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     TextView mainInfo;
     @Bind(R.id.w_aqi_view)
     AqiView wAqiView;
+    @Bind(R.id.container_layout)
+    LinearLayout containerLayout;
+    @Bind(R.id.danmaku_view)
+    DanmakuView danmakuView;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
 //    @Bind(R.id.player)
 //    EasyVideoPlayer player;
 
@@ -129,7 +133,8 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     private BaseRecyclerAdapter mHoursForecastAdapter;
     private String mTemperature;
     private String mWeatherStatus;
-
+    private float mXPos_Container=0;
+    private float mXPos_Aqi=0;
     @Bind(R.id.swipe_container)
     public MultiSwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -240,6 +245,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         if (typeface == null) {
             typeface = Typeface.createFromAsset(getAssets(), "fonts/mxx_font2.ttf");
         }
+
         mainDynamicweatherview.setDrawerType(BaseDrawer.Type.RAIN_SNOW_D);
         mAppBarLayout.addOnOffsetChangedListener(this);
 
@@ -251,14 +257,14 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 //        CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) mToolbar.getLayoutParams();
 //        params.height = toolbar_hight;
 //        mToolbar.setLayoutParams(params);
-        setSupportActionBar(mToolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //去除阴影
         if (Build.VERSION.SDK_INT >= 21) {
             getSupportActionBar().setElevation(0);
             mAppBarLayout.setElevation(0);
         }
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open,
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open,
                 R.string.drawer_close);
         mDrawerToggle.syncState();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -335,6 +341,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -349,7 +356,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        if (Math.abs(verticalOffset) > appBarLayout.getTotalScrollRange()/2) {
+        if (Math.abs(verticalOffset) > appBarLayout.getTotalScrollRange() / 2) {
             mainTemp.setVisibility(View.INVISIBLE);
             mainInfo.setVisibility(View.INVISIBLE);
             wAqiView.setVisibility(View.INVISIBLE);
@@ -359,11 +366,24 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             mainInfo.setVisibility(View.VISIBLE);
             wAqiView.setVisibility(View.VISIBLE);
         }
+
         if (mSwipeRefreshLayout != null)
             mSwipeRefreshLayout.setEnabled(verticalOffset == 0);
         float alpha = (float) Math.abs(verticalOffset) / (float) appBarLayout.getTotalScrollRange() * 1.0f;
-        if (mToolbar != null)
-            mToolbar.setAlpha(alpha);
+        if (toolbar != null)
+            toolbar.setAlpha(alpha);
+        containerLayout.setAlpha(1 - alpha);
+        containerLayout.setScaleX(1 - alpha);
+        containerLayout.setScaleY(1 - alpha);
+        if(mXPos_Container==0)
+            mXPos_Container = containerLayout.getX();
+        containerLayout.setX(mXPos_Container * (1 - alpha));
+        wAqiView.setAlpha(1 - alpha);
+        wAqiView.setScaleX(1 - alpha);
+        wAqiView.setScaleY(1 - alpha);
+        if(mXPos_Aqi==0)
+            mXPos_Aqi = wAqiView.getX();
+        wAqiView.setX(mXPos_Aqi * (1 - alpha));
     }
 
 

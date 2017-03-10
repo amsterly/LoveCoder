@@ -6,23 +6,40 @@
     android:layout_height="300dp"
     android:fitsSystemWindows="true"
     app:layout_collapseMode="parallax">
-    <ImageView
-        android:id="@+id/main_bg"
+    <!--<ImageView-->
+    <!--android:id="@+id/main_bg"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="400dp"-->
+    <!--android:fitsSystemWindows="true"-->
+    <!--android:scaleType="centerCrop"-->
+    <!--app:layout_collapseMode="parallax"-->
+    <!--app:layout_collapseParallaxMultiplier="0.7" />-->
+
+
+    <com.amsterly.lovecoder.lovecoder.ui.widget.AqiView
+        android:id="@+id/w_aqi_view"
+        android:layout_width="140dp"
+        android:layout_height="120dp"
+        android:layout_above="@+id/main_hours_forecast_recyclerView"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="center_vertical" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_hours_forecast_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:fitsSystemWindows="true"
-        android:scaleType="centerCrop"
-        app:layout_collapseMode="parallax"
-        app:layout_collapseParallaxMultiplier="0.7" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="@color/disable_or_hint_white" />
 
     <LinearLayout
         android:id="@+id/container_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="120dp"
-        android:orientation="horizontal"
-        app:layout_collapseMode="parallax">
+        android:layout_above="@+id/main_hours_forecast_recyclerView"
+        android:layout_centerInParent="true"
+        android:layout_margin="@dimen/common_dimen_huge"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/main_temp"
@@ -33,30 +50,18 @@
             android:textAppearance="@style/TextAppearance.RobotoThinPath"
             android:textColor="@color/main_background"
             android:textSize="@dimen/text_size_main_special" />
-
+<!---->
         <TextView
             android:id="@+id/main_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
             android:textColor="@color/main_background"
             android:textSize="@dimen/text_size_appbar_title" />
     </LinearLayout>
-    <com.amsterly.lovecoder.lovecoder.ui.widget.AqiView
-        android:id="@+id/w_aqi_view"
-        android:layout_width="140dp"
-        android:layout_height="120dp"
-        android:layout_above="@+id/main_hours_forecast_recyclerView"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="center_vertical"
-        />
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/main_hours_forecast_recyclerView"
-        android:layout_below="@+id/container_layout"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@color/disable_or_hint_white" />
+
+
 
     <master.flame.danmaku.ui.widget.DanmakuView
         android:id="@+id/danmaku_view"
