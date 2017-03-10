@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="300dp"
     android:fitsSystemWindows="true"
-
     app:layout_collapseMode="parallax">
     <ImageView
         android:id="@+id/main_bg"
@@ -42,9 +41,18 @@
             android:textColor="@color/main_background"
             android:textSize="@dimen/text_size_appbar_title" />
     </LinearLayout>
-
+    <com.amsterly.lovecoder.lovecoder.ui.widget.AqiView
+        android:id="@+id/w_aqi_view"
+        android:layout_width="140dp"
+        android:layout_height="120dp"
+        android:layout_above="@+id/main_hours_forecast_recyclerView"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="center_vertical"
+        />
     <android.support.v7.widget.RecyclerView
         android:id="@+id/main_hours_forecast_recyclerView"
+        android:layout_below="@+id/container_layout"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

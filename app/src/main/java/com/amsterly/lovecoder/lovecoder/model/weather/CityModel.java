@@ -103,7 +103,7 @@ public class CityModel extends BaseModel {
     }
 
     public String getDefaultId() {
-        return mDefaultId;
+        return Constants.DEFAULT_STR.equals(mDefaultId)?Constants.DEFAULT_CITY_ID:mDefaultId;
     }
 
     public boolean noDefaultCity() {

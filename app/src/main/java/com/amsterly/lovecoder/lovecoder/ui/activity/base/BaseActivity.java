@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.amsterly.lovecoder.lovecoder.presenter.base.BasePresenter;
 import com.amsterly.lovecoder.lovecoder.utils.SystemBarTintManager;
 import com.amsterly.lovecoder.lovecoder.view.base.IBase;
+import com.silencedut.router.Router;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -53,12 +54,14 @@ public abstract class BaseActivity<V,T extends BasePresenter<V>> extends AppComp
         if (this.mCompositeSubscription != null) {
             this.mCompositeSubscription.unsubscribe();
         }
+        Router.instance().unregister(this);
     }
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = createPresenter();
+        Router.instance().register(this);
     }
 
     protected abstract T createPresenter();

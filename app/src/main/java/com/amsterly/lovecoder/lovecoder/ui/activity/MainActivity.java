@@ -1,7 +1,9 @@
 package com.amsterly.lovecoder.lovecoder.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,7 +23,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.amsterly.lovecoder.lovecoder.App;
@@ -38,6 +39,7 @@ import com.amsterly.lovecoder.lovecoder.ui.adapter.DailyWeatherData;
 import com.amsterly.lovecoder.lovecoder.ui.adapter.HourWeatherHolder;
 import com.amsterly.lovecoder.lovecoder.ui.adapter.LifeIndexData;
 import com.amsterly.lovecoder.lovecoder.ui.adapter.MeizhiListAdapter;
+import com.amsterly.lovecoder.lovecoder.ui.widget.AqiView;
 import com.amsterly.lovecoder.lovecoder.ui.widget.MultiSwipeRefreshLayout;
 import com.amsterly.lovecoder.lovecoder.ui.widget.dynamicweather.BaseDrawer;
 import com.amsterly.lovecoder.lovecoder.ui.widget.dynamicweather.DynamicWeatherView;
@@ -64,14 +66,12 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.ui.widget.DanmakuView;
 
-import static com.amsterly.lovecoder.lovecoder.R.id.meizhi;
-
 //import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 
 public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter> implements IMain, AppBarLayout.OnOffsetChangedListener {
 
 
-//    @Bind(R.id.headerView)
+    //    @Bind(R.id.headerView)
 //    RelativeLayout mHeaderView;
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -101,6 +101,8 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     TextView mainTemp;
     @Bind(R.id.main_info)
     TextView mainInfo;
+    @Bind(R.id.w_aqi_view)
+    AqiView wAqiView;
 //    @Bind(R.id.player)
 //    EasyVideoPlayer player;
 
@@ -130,6 +132,13 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
     @Bind(R.id.swipe_container)
     public MultiSwipeRefreshLayout mSwipeRefreshLayout;
+
+
+    public static Typeface typeface;
+
+    public static Typeface getTypeface(Context context) {
+        return typeface;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,6 +237,9 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     }
 
     private void initParam() {
+        if (typeface == null) {
+            typeface = Typeface.createFromAsset(getAssets(), "fonts/mxx_font2.ttf");
+        }
         mainDynamicweatherview.setDrawerType(BaseDrawer.Type.RAIN_SNOW_D);
         mAppBarLayout.addOnOffsetChangedListener(this);
 
@@ -328,7 +340,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             public void run() {
                 mPresenter.loadData(true);
 
-                mPresenter.updateDefaultWeather();
+//                mPresenter.updateDefaultWeather();
             }
         }, 358);
         ;
@@ -337,14 +349,21 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        if (verticalOffset == 0) {
-        } else if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+        if (Math.abs(verticalOffset) > appBarLayout.getTotalScrollRange()/2) {
+            mainTemp.setVisibility(View.INVISIBLE);
+            mainInfo.setVisibility(View.INVISIBLE);
+            wAqiView.setVisibility(View.INVISIBLE);
+        }//Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()
+        else {
+            mainTemp.setVisibility(View.VISIBLE);
+            mainInfo.setVisibility(View.VISIBLE);
+            wAqiView.setVisibility(View.VISIBLE);
         }
-        if(mSwipeRefreshLayout!=null)
-        mSwipeRefreshLayout.setEnabled(verticalOffset == 0);
+        if (mSwipeRefreshLayout != null)
+            mSwipeRefreshLayout.setEnabled(verticalOffset == 0);
         float alpha = (float) Math.abs(verticalOffset) / (float) appBarLayout.getTotalScrollRange() * 1.0f;
-       if(mToolbar!=null)
-        mToolbar.setAlpha(alpha);
+        if (mToolbar != null)
+            mToolbar.setAlpha(alpha);
     }
 
 
@@ -470,6 +489,8 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         mWeatherStatus = basicData.getWeather();
         mainTemp.setText(mTemperature);
         mainInfo.setText(mWeatherStatus);
+
+
 //
 //        if (TimeUtil.isNight()) {
 //            if (Constants.sunny(mWeatherStatus)) {
@@ -486,7 +507,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
     @Override
     public void onMoreInfo(AqiData aqiData, List<DailyWeatherData> dailyForecastDatas, LifeIndexData lifeIndexData) {
-
+        wAqiView.setQuality(aqiData.aqiData.getAqi().equals("") ? -1 : Float.parseFloat(aqiData.aqiData.getAqi()), aqiData.aqiData.getQuality());
     }
 
     @Override

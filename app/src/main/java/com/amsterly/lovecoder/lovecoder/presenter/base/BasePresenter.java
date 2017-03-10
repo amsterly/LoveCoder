@@ -2,6 +2,8 @@ package com.amsterly.lovecoder.lovecoder.presenter.base;
 
 import android.util.Log;
 
+import com.silencedut.router.Router;
+
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
@@ -21,7 +23,9 @@ public abstract class BasePresenter<T> {
     public void attachView(T view) {
         Log.d(TAG, "attachView: "+mViewRef);
         mViewRef = new WeakReference<T>(view);
+        Router.instance().register(this);
         Log.d(TAG, "attachView: "+mViewRef);
+
     }
 
     protected T getView() {
@@ -37,6 +41,7 @@ public abstract class BasePresenter<T> {
             mViewRef.clear();
             mViewRef = null;
         }
+        Router.instance().unregister(this);
     }
 
     //添加一个Subscription

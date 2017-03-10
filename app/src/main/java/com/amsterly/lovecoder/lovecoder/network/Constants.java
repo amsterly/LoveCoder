@@ -29,7 +29,7 @@ public class Constants {
     public static final String MAIN_PAGE_WEATHER = "MAIN_PAGE_WEATHER";
     public static final String DEFAULT_CITY = "DEFAULT_CITY";
     public static final String FOLLOWED_CITIES = "FOLLOWED_CITIES";
-    public static final String DEFAULT_CITY_ID = "101220901";//亳州CityId
+    public static final String DEFAULT_CITY_ID = "101010100";//北京CityId
 
     public static final String DEFAULT_STR = "$";
 

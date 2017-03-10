@@ -1,20 +1,32 @@
 package com.amsterly.lovecoder.lovecoder.presenter.home;
 
 
+import android.widget.Toast;
+
 import com.amsterly.lovecoder.lovecoder.App;
+import com.amsterly.lovecoder.lovecoder.R;
+import com.amsterly.lovecoder.lovecoder.model.HoursForecastData;
 import com.amsterly.lovecoder.lovecoder.model.MeizhiData;
 import com.amsterly.lovecoder.lovecoder.model.ModelManager;
+import com.amsterly.lovecoder.lovecoder.model.callbacks.ModelCallback;
 import com.amsterly.lovecoder.lovecoder.model.entity.Gank;
 import com.amsterly.lovecoder.lovecoder.model.entity.Meizhi;
+import com.amsterly.lovecoder.lovecoder.model.entity.WeatherEntity;
 import com.amsterly.lovecoder.lovecoder.model.weather.CityModel;
 import com.amsterly.lovecoder.lovecoder.model.weather.WeatherModel;
 import com.amsterly.lovecoder.lovecoder.model.休息视频Data;
+import com.amsterly.lovecoder.lovecoder.network.Constants;
 import com.amsterly.lovecoder.lovecoder.ui.activity.MainActivity;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.AqiData;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.DailyWeatherData;
+import com.amsterly.lovecoder.lovecoder.ui.adapter.LifeIndexData;
 import com.amsterly.lovecoder.lovecoder.utils.Dates;
+import com.amsterly.lovecoder.lovecoder.utils.PreferencesUtil;
 import com.amsterly.lovecoder.lovecoder.view.home.IMain;
 import com.amsterly.lovecoder.lovecoder.presenter.base.BasePresenter;
 import com.litesuits.orm.db.model.ConflictAlgorithm;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +44,7 @@ import static com.amsterly.lovecoder.lovecoder.ui.activity.base.SwipeRefreshBase
 /**
  * create by lvwenbo
  */
-public class MainPresenter extends BasePresenter<IMain> {
+public class MainPresenter extends BasePresenter<IMain> implements ModelCallback.LocationResult, ModelCallback.WeatherResult{
     private final WeatherModel mWeatherModel;
     private IMain iview;
 
@@ -41,6 +53,7 @@ public class MainPresenter extends BasePresenter<IMain> {
         iview = getView();
         mCityModel = ModelManager.getModel(CityModel.class);
         mWeatherModel = ModelManager.getModel(WeatherModel.class);
+        mCityModel.startLocation();
     }
 
     public void loadData() {
@@ -148,5 +161,50 @@ public class MainPresenter extends BasePresenter<IMain> {
     private void getWeather(final String cityId) {
         getView().onRefreshing(true);
         mWeatherModel.updateWeather(cityId);
+    }
+
+    @Override
+    public void onLocationComplete(String cityId, boolean success) {
+        if (!success && mCityModel.noDefaultCity()) {
+            Toast.makeText(getView().getMContext(), R.string.add_city_hand_mode, Toast.LENGTH_LONG).show();
+//            SearchActivity.navigationActivity(getView().getMContext());
+//            return;
+//            mCityModel.setDefaultId(Constants.DEFAULT_CITY_ID);
+        }
+
+//        //定位失败就暂用北京的啦
+//        cityId = "101010100";
+
+//        if (!mCityModel.getDefaultId().equals(cityId)) {
+            getWeather(cityId);
+//        }
+    }
+
+    @Override
+    public void onWeather(WeatherEntity weatherEntity) {
+        if (weatherEntity == null) {
+            getView().onRefreshing(false);
+        } else {
+
+            WeatherEntity.BasicEntity basicEntity = weatherEntity.getBasic();
+            List<HoursForecastData> hoursForecastDatas = new ArrayList<>();
+            for (WeatherEntity.HoursForecastEntity hoursForecastEntity : weatherEntity.getHoursForecast()) {
+                hoursForecastDatas.add(new HoursForecastData(hoursForecastEntity));
+            }
+            AqiData aqiData = new AqiData(weatherEntity.getAqi());
+            List<DailyWeatherData> dailyWeatherDatas = new ArrayList<>();
+            List<WeatherEntity.DailyForecastEntity> dailyForecastEntities = weatherEntity.getDailyForecast();
+            for (int count = 0; count < dailyForecastEntities.size() - 2; count++) {
+                // only take 5 days weather
+                dailyWeatherDatas.add(new DailyWeatherData(dailyForecastEntities.get(count)));
+            }
+            LifeIndexData lifeIndexData = new LifeIndexData(weatherEntity.getLifeIndex());
+
+            boolean isLocationCity = weatherEntity.getCityId().equals(PreferencesUtil.get(Constants.LOCATION, Constants.DEFAULT_STR));
+
+            getView().onBasicInfo(basicEntity, hoursForecastDatas, isLocationCity);
+            getView().onMoreInfo(aqiData, dailyWeatherDatas, lifeIndexData);
+
+        }
     }
 }

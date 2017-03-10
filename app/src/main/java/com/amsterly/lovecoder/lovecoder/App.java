@@ -3,6 +3,7 @@ package com.amsterly.lovecoder.lovecoder;
 import android.app.Application;
 import android.content.Context;
 
+import com.amsterly.lovecoder.lovecoder.db.DBManage;
 import com.amsterly.lovecoder.lovecoder.utils.Toasts;
 import com.google.gson.Gson;
 import com.litesuits.orm.LiteOrm;
@@ -29,6 +30,8 @@ public class App extends Application {
         if (BuildConfig.DEBUG) {
             sDb.setDebugged(true);
         }
+        //城市库
+        DBManage.getInstance().copyCitysToDB();
     }
     public static Gson getGson() {
         return sGson;
