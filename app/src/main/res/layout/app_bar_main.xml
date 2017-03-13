@@ -4,12 +4,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
->
+    android:layout_height="match_parent">
+
     <com.amsterly.lovecoder.lovecoder.ui.widget.dynamicweather.DynamicWeatherView
         android:id="@+id/main_dynamicweatherview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
     <com.amsterly.lovecoder.lovecoder.ui.widget.MultiSwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
@@ -27,28 +28,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:fitsSystemWindows="true"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-<!--   app:contentScrim="?attr/colorPrimary"-->
+                android:fitsSystemWindows="true">
+                <!--   app:contentScrim="?attr/colorPrimary"-->
                 <android.support.design.widget.CollapsingToolbarLayout
                     android:id="@+id/collapse_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fitsSystemWindows="true"
-
                     app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
                     <include layout="@layout/view_header"></include>
 
                     <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
+                        android:id="@+id/toolbar2"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="top"
-                        android:minHeight="?attr/actionBarSize"
-                        app:layout_collapseMode="pin"
-                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                        app:titleMarginTop="15dp" />
+                        android:layout_height="wrap_content"></android.support.v7.widget.Toolbar>
 
                     <!--<android.support.design.widget.TabLayout-->
                     <!--android:id="@+id/tab_layout"-->
@@ -70,6 +64,53 @@
                 android:paddingLeft="2dp"
                 android:paddingRight="2dp"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:popupTheme="@style/Theme.AppCompat.Light"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark"
+                app:titleMarginTop="15dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/toolbar_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/common_dimen_small"
+                        android:layout_marginRight="@dimen/common_dimen_small"
+                        android:text="-°"
+                        android:textAppearance="@style/TextAppearance.RobotoThinPath"
+                        android:textSize="@dimen/text_size_big_title" />
+
+                    <TextView
+                        android:layout_toRightOf="@+id/toolbar_temperature"
+                        android:id="@+id/toolbar_quality"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/common_dimen_small"
+                        android:layout_marginRight="@dimen/common_dimen_small"
+                        android:text="0"
+                        android:textAppearance="@style/TextAppearance.RobotoThinPath"
+                        android:textSize="@dimen/text_size_big_title" />
+
+                    <TextView
+                        android:id="@+id/toolbar_city"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="@dimen/common_dimen_huge"
+                        android:text="北京"
+                        android:textAppearance="@style/TextAppearance.RobotoThinPath"
+                        android:textSize="@dimen/text_size_big_title" />
+                </RelativeLayout>
+
+            </android.support.v7.widget.Toolbar>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/main_fab"

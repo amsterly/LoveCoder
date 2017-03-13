@@ -107,6 +107,12 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     DanmakuView danmakuView;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
+    @Bind(R.id.toolbar_temperature)
+    TextView toolbarTemperature;
+    @Bind(R.id.toolbar_quality)
+    TextView toolbarQuality;
+    @Bind(R.id.toolbar_city)
+    TextView toolbarCity;
 //    @Bind(R.id.player)
 //    EasyVideoPlayer player;
 
@@ -133,8 +139,8 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     private BaseRecyclerAdapter mHoursForecastAdapter;
     private String mTemperature;
     private String mWeatherStatus;
-    private float mXPos_Container=0;
-    private float mXPos_Aqi=0;
+    private float mXPos_Container = 0;
+    private float mXPos_Aqi = 0;
     @Bind(R.id.swipe_container)
     public MultiSwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -199,6 +205,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         });
         danmakuContext = DanmakuContext.create();
         danmakuView.prepare(parser, danmakuContext);
+
     }
 
     /**
@@ -257,6 +264,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 //        CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) mToolbar.getLayoutParams();
 //        params.height = toolbar_hight;
 //        mToolbar.setLayoutParams(params);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //去除阴影
@@ -360,28 +368,36 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             mainTemp.setVisibility(View.INVISIBLE);
             mainInfo.setVisibility(View.INVISIBLE);
             wAqiView.setVisibility(View.INVISIBLE);
+            toolbarQuality.setVisibility(View.VISIBLE);
+            toolbarTemperature.setVisibility(View.VISIBLE);
+            showDanmaku=false;
+//            danmakuView.stop();
         }//Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()
         else {
             mainTemp.setVisibility(View.VISIBLE);
             mainInfo.setVisibility(View.VISIBLE);
             wAqiView.setVisibility(View.VISIBLE);
+            toolbarQuality.setVisibility(View.INVISIBLE);
+            toolbarTemperature.setVisibility(View.INVISIBLE);
+//            danmakuView.start();
+            showDanmaku=true;
         }
 
         if (mSwipeRefreshLayout != null)
             mSwipeRefreshLayout.setEnabled(verticalOffset == 0);
         float alpha = (float) Math.abs(verticalOffset) / (float) appBarLayout.getTotalScrollRange() * 1.0f;
-        if (toolbar != null)
-            toolbar.setAlpha(alpha);
+//        if (toolbar != null)
+//            toolbar.setAlpha(alpha);
         containerLayout.setAlpha(1 - alpha);
         containerLayout.setScaleX(1 - alpha);
         containerLayout.setScaleY(1 - alpha);
-        if(mXPos_Container==0)
+        if (mXPos_Container == 0)
             mXPos_Container = containerLayout.getX();
         containerLayout.setX(mXPos_Container * (1 - alpha));
         wAqiView.setAlpha(1 - alpha);
         wAqiView.setScaleX(1 - alpha);
         wAqiView.setScaleY(1 - alpha);
-        if(mXPos_Aqi==0)
+        if (mXPos_Aqi == 0)
             mXPos_Aqi = wAqiView.getX();
         wAqiView.setX(mXPos_Aqi * (1 - alpha));
     }
@@ -509,6 +525,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         mWeatherStatus = basicData.getWeather();
         mainTemp.setText(mTemperature);
         mainInfo.setText(mWeatherStatus);
+        toolbarTemperature.setText(mTemperature);
 
 
 //
@@ -528,6 +545,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     @Override
     public void onMoreInfo(AqiData aqiData, List<DailyWeatherData> dailyForecastDatas, LifeIndexData lifeIndexData) {
         wAqiView.setQuality(aqiData.aqiData.getAqi().equals("") ? -1 : Float.parseFloat(aqiData.aqiData.getAqi()), aqiData.aqiData.getQuality());
+        toolbarQuality.setText(aqiData.aqiData.getAqi().equals("") ?"":aqiData.aqiData.getAqi());
     }
 
     @Override

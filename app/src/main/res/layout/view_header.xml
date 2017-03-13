@@ -18,8 +18,8 @@
 
     <com.amsterly.lovecoder.lovecoder.ui.widget.AqiView
         android:id="@+id/w_aqi_view"
-        android:layout_width="140dp"
-        android:layout_height="120dp"
+        android:layout_width="120dp"
+        android:layout_height="100dp"
         android:layout_above="@+id/main_hours_forecast_recyclerView"
         android:layout_alignParentRight="true"
         android:layout_gravity="center_vertical" />
