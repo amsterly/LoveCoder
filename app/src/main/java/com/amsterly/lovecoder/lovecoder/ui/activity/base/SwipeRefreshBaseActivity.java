@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
  */
 
 public  abstract class SwipeRefreshBaseActivity <V,T extends BasePresenter<V>> extends BaseActivity<V,T> implements  SwipeRefreshLayer {
-    @Bind(R.id.swipe_container)
+//    @Bind(R.id.swipe_container)
     public MultiSwipeRefreshLayout mSwipeRefreshLayout;
     private boolean mIsRequestDataRefresh = false;
     public static final GankApi sGankIO = DrakeetFactory.getGankIOSingleton();
@@ -35,7 +35,7 @@ public  abstract class SwipeRefreshBaseActivity <V,T extends BasePresenter<V>> e
     }
     @Override public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
-//        ButterKnife.bind(this);
+        ButterKnife.bind(this);
 //        mSwipeRefreshLayout.setProgressViewOffset(false,100,300);
     }
 

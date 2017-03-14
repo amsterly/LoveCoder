@@ -54,7 +54,7 @@ public class DynamicWeatherView extends SurfaceView implements SurfaceHolder.Cal
 		if (type == null) {
 			return;
 		}
-		// UIUtil.toastDebug(getContext(), "setDrawerType->" + type.name());
+		// UiUtil.toastDebug(getContext(), "setDrawerType->" + type.name());
 		if (type != curType) {
 			curType = type;
 			setDrawer(BaseDrawer.makeDrawerByType(getContext(), curType));

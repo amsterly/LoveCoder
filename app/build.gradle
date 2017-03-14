@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.antfortune.freeline'
+//apply plugin: 'com.antfortune.freeline'
 //apply plugin: 'me.tatarka.retrolambda'
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -30,11 +30,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    freeline {
-        hack true
-        //如果你定义了productFlavor, 记得把下面的注释放开, 把{Your-productFlavor}替换成你相应的productFlavor
-        //productFlavor '{Your-productFlavor}'
-    }
+//    freeline {
+//        hack true
+//        //如果你定义了productFlavor, 记得把下面的注释放开, 把{Your-productFlavor}替换成你相应的productFlavor
+//        //productFlavor '{Your-productFlavor}'
+//    }
     compileOptions {
 
         sourceCompatibility JavaVersion.VERSION_1_7

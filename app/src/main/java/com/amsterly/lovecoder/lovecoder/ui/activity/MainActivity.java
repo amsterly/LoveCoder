@@ -15,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -146,6 +147,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
 
     public static Typeface typeface;
+    private boolean mIsRequestDataRefresh=false;
 
     public static Typeface getTypeface(Context context) {
         return typeface;
@@ -156,13 +158,47 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        trySetupSwipeRefresh();
         initParam();
         setupRecyclerView();
         setupHoursForecast();
         initDanmaku();
 
     }
-
+    void trySetupSwipeRefresh() {
+        if (mSwipeRefreshLayout != null) {
+            mSwipeRefreshLayout.setProgressViewOffset(false, 100, 300);
+            mSwipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
+//            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+            mSwipeRefreshLayout.setColorSchemeResources(R.color.refresh_progress_3,
+                    R.color.refresh_progress_2, R.color.refresh_progress_1);
+            // Do not use lambda here!
+            mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override public void onRefresh() {
+                    requestDataRefresh();
+                }
+            });
+        }
+    }
+    @Override
+    public void setRefresh(boolean requestDataRefresh) {
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
+        if (!requestDataRefresh) {
+            mIsRequestDataRefresh = false;
+            // 防止刷新消失太快，让子弹飞一会儿.
+            mSwipeRefreshLayout.postDelayed(new Runnable() {
+                @Override public void run() {
+                    if (mSwipeRefreshLayout != null) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+            }, 1000);
+        } else {
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
+    }
     private void initDanmaku() {
 //        Uri uri=Uri.parse("android:resource://"+getApplication().getPackageName()+"/"+R.raw.hashiqi);
 //        videoView.setVideoPath(uri.toString())  ;
@@ -216,8 +252,12 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             @Override
             public void run() {
                 while (showDanmaku) {
-                    int time = new Random().nextInt(500);
+                    int time = new Random().nextInt(2000);
                     String content = "" + time + time;
+                    if(time%2==0)
+                        content = "天气寒冷注意增减衣服";
+                    else
+                        content = "这还是北京么？都能看到对岸";
                     addDanmaku(content, false);
                     try {
                         Thread.sleep(time);
