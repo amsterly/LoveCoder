@@ -7,7 +7,7 @@
 * 视频播放。
 * 文字信息浏览。
 <br/>
-<br/>##上效果图啦<br/>
- ![image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/start.gif) 
-  ![image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/pic.gif) 
-   ![image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/video.gif) 
+<br/>## 上效果图啦<br/>
+ ! [image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/start.gif) 
+  ! [image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/pic.gif) 
+   ! [image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/video.gif) 
