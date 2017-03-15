@@ -10,4 +10,5 @@
  ![image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/start.gif) 
   ![image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/pic.gif) 
    ![image](https://github.com/amsterly/LoveCoder/tree/myproject/screenshots/screenshots/video.gif) 
-   图片不显示的点进去看吧 有点太大了 显示卡顿
+  </br>
+  由于录制的Gif有点太大了 所以需要点进去看 等缓存完毕了 速度就快多了
