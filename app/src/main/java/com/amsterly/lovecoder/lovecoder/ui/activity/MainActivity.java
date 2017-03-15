@@ -127,6 +127,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     private boolean mMeizhiBeTouched;
     //弹幕
     private boolean showDanmaku;
+    private boolean isFold = false;
 
 
     private DanmakuContext danmakuContext;
@@ -147,7 +148,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
 
     public static Typeface typeface;
-    private boolean mIsRequestDataRefresh=false;
+    private boolean mIsRequestDataRefresh = false;
 
     public static Typeface getTypeface(Context context) {
         return typeface;
@@ -165,6 +166,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         initDanmaku();
 
     }
+
     void trySetupSwipeRefresh() {
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setProgressViewOffset(false, 100, 300);
@@ -174,12 +176,14 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
                     R.color.refresh_progress_2, R.color.refresh_progress_1);
             // Do not use lambda here!
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override public void onRefresh() {
+                @Override
+                public void onRefresh() {
                     requestDataRefresh();
                 }
             });
         }
     }
+
     @Override
     public void setRefresh(boolean requestDataRefresh) {
         if (mSwipeRefreshLayout == null) {
@@ -189,7 +193,8 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             mIsRequestDataRefresh = false;
             // 防止刷新消失太快，让子弹飞一会儿.
             mSwipeRefreshLayout.postDelayed(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (mSwipeRefreshLayout != null) {
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
@@ -199,6 +204,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             mSwipeRefreshLayout.setRefreshing(true);
         }
     }
+
     private void initDanmaku() {
 //        Uri uri=Uri.parse("android:resource://"+getApplication().getPackageName()+"/"+R.raw.hashiqi);
 //        videoView.setVideoPath(uri.toString())  ;
@@ -254,7 +260,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
                 while (showDanmaku) {
                     int time = new Random().nextInt(2000);
                     String content = "" + time + time;
-                    if(time%2==0)
+                    if (time % 2 == 0)
                         content = "天气寒冷注意增减衣服";
                     else
                         content = "这还是北京么？都能看到对岸";
@@ -279,7 +285,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         BaseDanmaku danmaku = danmakuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
         danmaku.text = content;
         danmaku.padding = 5;
-        danmaku.textSize = (20);
+        danmaku.textSize = (25);
         danmaku.textColor = Color.WHITE;
         danmaku.setTime(danmakuView.getCurrentTime());
         if (withBorder) {
@@ -393,7 +399,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mPresenter.loadData(true);
+//                mPresenter.loadData(true);
 
 //                mPresenter.updateDefaultWeather();
             }
@@ -410,7 +416,8 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             wAqiView.setVisibility(View.INVISIBLE);
             toolbarQuality.setVisibility(View.VISIBLE);
             toolbarTemperature.setVisibility(View.VISIBLE);
-            showDanmaku=false;
+            showDanmaku = false;
+            isFold = true;
 //            danmakuView.stop();
         }//Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()
         else {
@@ -420,7 +427,8 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
             toolbarQuality.setVisibility(View.INVISIBLE);
             toolbarTemperature.setVisibility(View.INVISIBLE);
 //            danmakuView.start();
-            showDanmaku=true;
+            showDanmaku = true;
+            isFold = false;
         }
 
         if (mSwipeRefreshLayout != null)
@@ -519,6 +527,10 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
 
     @OnClick(R.id.main_fab)
     public void onFab(View v) {
+        if (isFold)
+            mAppBarLayout.setExpanded(true, true);
+        else
+            mAppBarLayout.setExpanded(false, true);
         if (mMeizhiList != null && mMeizhiList.size() > 0) {
 //            startGankActivity(mMeizhiList.get(0).publishedAt);
         }
@@ -585,7 +597,7 @@ public class MainActivity extends SwipeRefreshBaseActivity<IMain, MainPresenter>
     @Override
     public void onMoreInfo(AqiData aqiData, List<DailyWeatherData> dailyForecastDatas, LifeIndexData lifeIndexData) {
         wAqiView.setQuality(aqiData.aqiData.getAqi().equals("") ? -1 : Float.parseFloat(aqiData.aqiData.getAqi()), aqiData.aqiData.getQuality());
-        toolbarQuality.setText(aqiData.aqiData.getAqi().equals("") ?"":aqiData.aqiData.getAqi());
+        toolbarQuality.setText(aqiData.aqiData.getAqi().equals("") ? "" : aqiData.aqiData.getAqi());
     }
 
     @Override

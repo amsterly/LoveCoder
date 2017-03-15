@@ -21,6 +21,7 @@ public class App extends Application {
     private static Gson sGson = new Gson();
     @Override
     public void onCreate() {
+
         super.onCreate();
         //高效加载字体包
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder().setDefaultFontPath("fonts/NotoSans-Regular.ttf").setFontAttrId(R.attr.fontPath).build());

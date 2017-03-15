@@ -11,24 +11,27 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/lovecoder_bg"
-        android:scaleType="center"
+        android:src="@drawable/lovecoder2_bg"
+        android:scaleType="fitXY"
         android:contentDescription="ss" />
 
     <TextView
         android:id="@+id/id_lovecoderversion"
+        android:layout_below="@+id/id_lovecoderlable"
+        android:layout_margin="@dimen/common_dimen_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="v1.0"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
+/>
     <TextView
         android:id="@+id/id_lovecoderlable"
+        android:layout_margin="@dimen/common_dimen_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="爱媛猿"
         android:layout_alignParentRight="true"
-        android:layout_above="@+id/id_lovecoderversion"
+        android:layout_alignParentTop="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
 
